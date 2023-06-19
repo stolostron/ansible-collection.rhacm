@@ -28,6 +28,12 @@ collections:
     version: main
 ```
 
+The `kubernetes` pip package needs to be installed as it required by some of the collection roles.  
+Install the package from the `requirement.txt` file or add the package to your own `requirements.txt` file.
+```bash
+pip install requirements.txt
+```
+
 ### Prepare config file as input for execution
 
 Deployment of ACM based environment very generic.  
