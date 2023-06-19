@@ -28,6 +28,35 @@ collections:
     version: main
 ```
 
+### Prepare config file as input for execution
+
+Deployment of ACM based environment very generic.  
+It could be customized to meet various requirements.  
+Fetch the sample config [file](docs/config-sample.yml) and apply the changes that relevant for your environment.
+
+### Create playbook to execute the required roles
+
+Create playbook/s to call the relevant roles to create required resources.  
+The following example includes the following roles to create required environment: ocp, acm, managed_clusters.
+```yaml
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  collections:
+    - stolostron.rhacm
+  roles:
+    - ocp
+    - acm
+    - managed_cluster
+```
+
+### Execute deployment of the environment
+
+Perform environment deployment by using config file prepared earlier.
+```bash
+ansible-playbook playbook.yml -e @config.yml
+```
+
 ## Tested with Ansible
 
 TBD
