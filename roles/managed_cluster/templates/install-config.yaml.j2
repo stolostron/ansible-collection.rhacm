@@ -73,6 +73,9 @@ platform:
     ingressVIP: {{ item.network_ingress_vip }}
     network: {{ item.network_name }}
 {% endif %}
+{% if item.fips is defined %}
+fips: {{ item.fips }}
+{% endif %}
 pullSecret: "" # skip, hive will inject based on it's secrets
 sshKey: |
     {{ ssh_pub_key }}

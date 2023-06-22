@@ -44,6 +44,7 @@ clusters:
       instance_type: m5.xlarge
     creds_type: aws
     openshift_version: "4.12"  # Optional variable to set OCP version per cluster
+    fips: true  # Optional variable to enable FIPS on cluster
 ```
 
 #### Clusters credentials
