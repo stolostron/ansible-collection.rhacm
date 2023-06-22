@@ -55,12 +55,37 @@ The following example includes the following roles to create required environmen
     - acm
     - managed_cluster
 ```
+Check for playbooks examples [here](docs/playbooks_examples/).
 
 ### Execute deployment of the environment
 
 Perform environment deployment by using config file prepared earlier.
 ```bash
 ansible-playbook playbook.yml -e @config.yml
+```
+
+### Playbooks resources state
+
+Resources defined within the roles could be created or deleted.  
+Creation or deletion of the resources is done by cross roles variable called - `state`.  
+The variable `state` accept the following values - `present` or `absent`.  
+This variable could be provided in three possible places: config file, playbook or via the cli.
+
+Playbook example:
+```
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    state: present
+  roles:
+    - ocp
+    - acm
+```
+
+Command line example:
+```
+ansible-playbook playbooks/play.yml -e @config.yml -e state=absent
 ```
 
 ## Tested with Ansible
