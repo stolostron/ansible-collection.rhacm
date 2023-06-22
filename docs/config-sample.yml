@@ -1,6 +1,11 @@
 # Those are the main variables for the deployment
 # More variables could be found within the roles
 
+# Resources state. Controls if resources are created or deleted.
+# The var could be defined within config file, playbook or cli.
+# Two possible options: 'present' or 'absent'
+state: present
+
 ##########################
 # Cross roles shared vars
 ##########################
