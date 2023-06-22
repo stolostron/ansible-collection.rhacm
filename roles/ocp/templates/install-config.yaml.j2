@@ -44,6 +44,9 @@ platform:
     projectID: {{ item.cloud.project_id }}
 {% endif %}
 publish: External
+{% if item.fips is defined %}
+fips: {{ item.fips }}
+{% endif %}
 pullSecret: '{{ pull_secret }}'
 sshKey: |
   {{ ssh_pub_key }}

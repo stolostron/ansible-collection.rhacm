@@ -40,6 +40,7 @@ managed_clusters:
       service: 172.30.0.0/16
       type: OVNKubernetes
     managed_cluster_image: quay.io/openshift-release-dev/ocp-release:4.12.7-multi
+    fips: true  # Optional variable to enable FIPS on cluster
 ```
 
 #### Clusters credentials
