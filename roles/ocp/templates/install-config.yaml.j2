@@ -7,6 +7,10 @@ compute:
   platform:
     aws:
       type: {{ item.cloud.instance_type }}
+{% elif item.cloud.platform == "gcp" and item.cloud.instance_type is defined %}
+  platform:
+    gcp:
+      type: {{ item.cloud.instance_type }}
 {% else %}
   platform: {}
 {% endif %}
@@ -17,6 +21,10 @@ controlPlane:
 {% if item.cloud.platform == "aws" and item.cloud.instance_type is defined %}
   platform:
     aws:
+      type: {{ item.cloud.instance_type }}
+{% elif item.cloud.platform == "gcp" and item.cloud.instance_type is defined %}
+  platform:
+    gcp:
       type: {{ item.cloud.instance_type }}
 {% else %}
   platform: {}

@@ -31,11 +31,29 @@ clusters:
       instance_type: m5.xlarge
     creds_type: aws
     openshift_version: "4.12"  # Optional. If not specified, will deploy the latest stable version
+  - name: cluster2
+    base_domain: <cluster_base_domain>
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    cloud:
+      platform: gcp
+      region: us-east1
+      instance_type: n1-standard-4
+      project_id: gcp_project_name
+    creds_type: gcp
 
 clusters_credentials:
   aws:
     aws_access_key_id: <aws_access_key_id>
     aws_secret_access_key: <aws_secret_access_key>
+  gcp:
+    os_service_account_json: |
+      {
+        ...content of osServiceAccount.json...
+      }
 
 ###########
 # ACM role

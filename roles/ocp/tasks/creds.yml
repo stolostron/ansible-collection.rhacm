@@ -1,7 +1,15 @@
 ---
+- name: Set filename to store the creds in
+  ansible.builtin.set_fact:
+    creds_file: "{%- if item.creds_type == 'aws' -%}
+                 credentials
+                 {%- elif item.creds_type == 'gcp' -%}
+                 osServiceAccount.json
+                 {%- endif -%}"
+
 - name: Verify openshift cloud credentials
   ansible.builtin.stat:
-    path: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}/credentials"
+    path: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}/{{ creds_file }}"
   register: cloud_creds
 
 - block:
@@ -14,6 +22,6 @@
     - name: Create cloud credentials file
       ansible.builtin.template:
         src: cloud-creds.j2
-        dest: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}/credentials"
+        dest: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}/{{ creds_file }}"
         mode: 0600
   when: not cloud_creds.stat.exists
