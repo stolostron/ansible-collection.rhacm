@@ -63,8 +63,9 @@
     validate_certs: no
     api_version: operators.coreos.com/v1alpha1
     kind: CatalogSource
-    name: redhat-operators
-    namespace: openshift-marketplace
+    name: "{{ item.catalog_name }}"
+    namespace: "{{ item.catalog_ns }}"
+  loop: "{{ catalog_sources }}"
   register: acm_catalog
   until: acm_catalog.resources[0].status.connectionState.lastObservedState == "READY"
   retries: 15
