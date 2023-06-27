@@ -103,6 +103,8 @@
   register: acm_csv
   until:
     - acm_csv.resources | length > 0
+    - "'status' in acm_csv.resources[0]"
+    - "'phase' in acm_csv.resources[0].status"
     - acm_csv.resources[0].status.phase == "Succeeded"
   retries: 15
   delay: 10
