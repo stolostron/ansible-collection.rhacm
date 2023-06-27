@@ -31,7 +31,7 @@ ssh_pub_key:
 Provide the details of the clusters that needs to be deployed.
 ```
 clusters:
-  - name: test-cluster
+  - name: test-cluster1
     base_domain: example.com
     network:
       cluster: 10.128.0.0/14
@@ -45,6 +45,20 @@ clusters:
     creds_type: aws
     openshift_version: "4.12"  # Optional variable to set OCP version per cluster
     fips: true  # Optional variable to enable FIPS on cluster
+
+  - name: test-cluster2
+    base_domain: example.com
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    cloud:
+      platform: gcp
+      region: us-east1
+      instance_type: n1-standard-4
+      project_id: gcp_project_name
+    creds_type: gcp
 ```
 
 #### Clusters credentials
@@ -54,6 +68,12 @@ clusters_credentials:
   aws:
     aws_access_key_id: <your_key_id>
     aws_secret_access_key: <your_access_key>
+
+  gcp:
+    os_service_account_json: |
+      {
+        ...content of osServiceAccount.json...
+      }
 ```
 
 #### Openshift version

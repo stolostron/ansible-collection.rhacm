@@ -2,4 +2,6 @@
 [default]
 aws_access_key_id = {{ clusters_credentials[item.creds_type].aws_access_key_id }}
 aws_secret_access_key = {{ clusters_credentials[item.creds_type].aws_secret_access_key }}
+{% elif item.creds_type == "gcp" %}
+{{ clusters_credentials[item.creds_type].os_service_account_json }}
 {% endif %}
