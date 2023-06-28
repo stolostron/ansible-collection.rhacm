@@ -25,8 +25,8 @@ The variable is mandatory.
 ssh_pub_key:
 ```
 
-#### Managed clusters
-Defines managed clusters that should be deployed on the Hub.
+#### ACM Hive clusters
+Defines hive clusters that should be deployed on the Hub.
 **Note** - For more provides and override options, refer to `config-sample.yml` file.
 ```
 acm_hive_clusters:
@@ -44,7 +44,7 @@ acm_hive_clusters:
 ```
 
 #### Clusters credentials
-Define credentials that will be used by the managed clusters during creation.
+Define credentials that will be used by the hive clusters during creation.
 **Note** - For more provides and override options, refer to `config-sample.yml` file.
 ```
 acm_hive_clusters_credentials:
