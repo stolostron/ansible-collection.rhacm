@@ -1,0 +1,10 @@
+---
+- name: Deploy MultiClusterHub
+  community.okd.k8s:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: no
+    definition: "{{ lookup('template', 'multiclusterhub.yaml.j2') | from_yaml }}"
+    state: absent
+    wait: yes
+    wait_timeout: 1200

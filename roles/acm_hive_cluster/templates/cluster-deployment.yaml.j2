@@ -1,4 +1,4 @@
-{% set creds = managed_clusters_credentials | selectattr('name', 'equalto', item.credentials) | first %}
+{% set creds = acm_hive_clusters_credentials | selectattr('name', 'equalto', item.credentials) | first %}
 apiVersion: hive.openshift.io/v1
 kind: ClusterDeployment
 metadata:
@@ -53,6 +53,6 @@ spec:
       name: {{ item.name }}-install-config
     sshPrivateKeySecretRef:
       name: {{ item.name }}-ssh-private-key
-    releaseImage: {{ item.managed_cluster_image | default(managed_cluster_image) }}
+    releaseImage: {{ item.hive_cluster_image | default(hive_cluster_image) }}
   pullSecretRef:
     name: {{ item.name }}-pull-secret

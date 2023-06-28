@@ -1,25 +1,25 @@
 ---
 # curl -s -X GET https://quay.io/api/v1/repository/openshift-release-dev/ocp-release/tag/?filter_tag_name=like:4.9 \
 # | jq -S '.tags[] | {name: .name} | select(.name | endswith("x86_64"))' | jq -r '.name'
-- name: Fetch cluster image if not provided manually
+- name: Fetch hive cluster image if not provided manually
   ansible.builtin.uri:
-    url: "{{ ocp_image_query_url }}/?filter_tag_name=like:{{ item.managed_cluster_version }}"
+    url: "{{ ocp_image_query_url }}/?filter_tag_name=like:{{ item.hive_cluster_version }}"
     method: "GET"
     status_code: 200
   register: img
-  when: item.managed_cluster_image is not defined
+  when: item.hive_cluster_image is not defined
 
-- name: Select latest cluster image according to provided version
+- name: Select latest hive cluster image according to provided version
   ansible.builtin.set_fact:
-    managed_cluster_ver: "{{ img.json.tags
-      | selectattr('name', 'match', item.managed_cluster_version + '.*' + cluster_architecture | string)
+    hive_cluster_ver: "{{ img.json.tags
+      | selectattr('name', 'match', item.hive_cluster_version + '.*' + cluster_architecture | string)
       | map(attribute='name') | first }}"
-  when: item.managed_cluster_image is not defined
+  when: item.hive_cluster_image is not defined
 
-- name: Build managed cluster version url string
+- name: Build acm hive cluster version url string
   ansible.builtin.set_fact:
-    managed_cluster_image: "{{ ocp_image_base_url }}:{{ managed_cluster_ver }}"
-  when: item.managed_cluster_image is not defined
+    hive_cluster_image: "{{ ocp_image_base_url }}:{{ hive_cluster_ver }}"
+  when: item.hive_cluster_image is not defined
 
 - name: "{{ info_state }} Cluster Deployment for {{ item.name }} cluster"
   community.okd.k8s:

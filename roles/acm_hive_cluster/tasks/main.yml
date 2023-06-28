@@ -18,7 +18,7 @@
     validate_certs: no
     definition: "{{ lookup('template', 'global-credentials.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
-  loop: "{{ managed_clusters_credentials }}"
+  loop: "{{ acm_hive_clusters_credentials }}"
   no_log: true
 
 - name: "{{ info_state }} Managed Cluster"
@@ -28,7 +28,7 @@
     validate_certs: no
     definition: "{{ lookup('template', 'managed-cluster.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
-  loop: "{{ managed_clusters }}"
+  loop: "{{ acm_hive_clusters }}"
 
 - name: Prepare clusters secrets
   ansible.builtin.include_tasks:
@@ -42,7 +42,7 @@
     validate_certs: no
     definition: "{{ lookup('template', 'machine-pool.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
-  loop: "{{ managed_clusters }}"
+  loop: "{{ acm_hive_clusters }}"
 
 - name: "{{ info_state }} cluster KlusterletAddonConfig"
   community.okd.k8s:
@@ -51,12 +51,12 @@
     validate_certs: no
     definition: "{{ lookup('template', 'klusterlet-addon-config.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
-  loop: "{{ managed_clusters }}"
+  loop: "{{ acm_hive_clusters }}"
 
 - name: "{{ info_state }} Cluster Deployment"
   ansible.builtin.include_tasks:
     file: cluster_deployment.yml
-  loop: "{{ managed_clusters }}"
+  loop: "{{ acm_hive_clusters }}"
 
 - block:
     - name: Wait for cluster provisioning to complete
@@ -73,7 +73,7 @@
         wait_condition:
           type: Provisioned
           status: True
-      loop: "{{ managed_clusters }}"
+      loop: "{{ acm_hive_clusters }}"
 
     - name: Wait for cluster to become ready
       kubernetes.core.k8s_info:
@@ -89,7 +89,7 @@
         wait_condition:
           type: Ready
           status: True
-      loop: "{{ managed_clusters }}"
+      loop: "{{ acm_hive_clusters }}"
   when: state == "present"
 
 - block:
@@ -102,7 +102,7 @@
         kind: ClusterDeployment
         name: "{{ item.name }}"
         namespace: "{{ item.name }}"
-      loop: "{{ managed_clusters }}"
+      loop: "{{ acm_hive_clusters }}"
       register: cl_remove
       until: cl_remove.resources | length == 0
       retries: 50
@@ -117,7 +117,7 @@
         kind: ManagedCluster
         name: "{{ item.name }}"
         namespace: "{{ item.name }}"
-      loop: "{{ managed_clusters }}"
+      loop: "{{ acm_hive_clusters }}"
       register: mc_remove
       until: mc_remove.resources | length == 0
       retries: 50
