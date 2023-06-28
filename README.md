@@ -7,7 +7,7 @@ Name | Description
 --- | ---
 [stolostron.rhacm.ocp](docs/ocp.md)| Deploy standalone Openshift cluster/s on different cloud platforms.
 [stolostron.rhacm.acm](docs/acm.md)| Deploy Advanced Cluster Management (ACM) platform on selected cluster.
-[stolostron.rhacm.managed_cluster](docs/managed_cluster.md)| Deploy managed cluster/s on the hub, by the hub using hive engine.
+[stolostron.rhacm.acm_hive_cluster](docs/acm_hive_cluster.md)| Deploy ACM hive cluster/s on the hub, by the hub using hive engine.
 [stolostron.rhacm.cluster_login](docs/cluster_login.md)| Create Openshift cluster login token to perform operations on the cluster.
 
 ## Using this collection
@@ -43,7 +43,7 @@ Fetch the sample config [file](docs/config-sample.yml) and apply the changes tha
 ### Create playbook to execute the required roles
 
 Create playbook/s to call the relevant roles to create required resources.  
-The following example includes the following roles to create required environment: ocp, acm, managed_clusters.
+The following example includes the following roles to create required environment: ocp, acm, acm_hive_cluster.
 ```yaml
 - hosts: localhost
   connection: local
@@ -53,7 +53,7 @@ The following example includes the following roles to create required environmen
   roles:
     - ocp
     - acm
-    - managed_cluster
+    - acm_hive_cluster
 ```
 Check for playbooks examples [here](docs/playbooks_examples/).
 

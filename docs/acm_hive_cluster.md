@@ -1,11 +1,11 @@
-# Managed Cluster
+# ACM Hive Cluster
 
 ## Description
-The `managed_cluster` role prepares and deploys Managed Clusters on a Hub cluster.
+The `acm_hive_cluster` role prepares and deploys clusters on a Hub cluster.
 
 ## Role Variables
 #### State
-State of the managed clusters. Could be "present" or "absent".
+State of the hive clusters. Could be "present" or "absent".
 ```
 state: present
 ```
@@ -29,7 +29,7 @@ ssh_pub_key:
 Defines managed clusters that should be deployed on the Hub.
 **Note** - For more provides and override options, refer to `config-sample.yml` file.
 ```
-managed_clusters:
+acm_hive_clusters:
   - name: cluster1
     credentials: cluster1-creds
     platform: aws
@@ -39,7 +39,7 @@ managed_clusters:
       machine: 10.0.0.0/16
       service: 172.30.0.0/16
       type: OVNKubernetes
-    managed_cluster_image: quay.io/openshift-release-dev/ocp-release:4.12.7-multi
+    hive_cluster_image: quay.io/openshift-release-dev/ocp-release:4.12.7-multi
     fips: true  # Optional variable to enable FIPS on cluster
 ```
 
@@ -47,7 +47,7 @@ managed_clusters:
 Define credentials that will be used by the managed clusters during creation.
 **Note** - For more provides and override options, refer to `config-sample.yml` file.
 ```
-managed_clusters_credentials:
+acm_hive_clusters_credentials:
   - name: cluster1-creds
     platform: aws
     namespace: open-cluster-management-hub
@@ -76,5 +76,5 @@ The variables could be applied to the playbook run, by saving them into a separa
 Note the '@' sign, which is used to apply the variables located within the provided file.
 
 ```
-ansible-playbook playbooks/managed_cluster.yml -e @/path/to/the/variable/file.yml
+ansible-playbook playbooks/acm_hive_cluster.yml -e @/path/to/the/variable/file.yml
 ```
