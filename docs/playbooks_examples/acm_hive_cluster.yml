@@ -1,5 +1,5 @@
 ---
-- name: Managed Clusters
+- name: ACM Hive Clusters
   hosts: localhost
   gather_facts: false
   collections:

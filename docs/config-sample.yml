@@ -72,7 +72,7 @@ registry_secrets:
     pass: "<password>"
 
 ########################
-# MANAGED CLUSTERS role
+# ACM HIVE CLUSTERS role
 ########################
 
 acm_hive_clusters:
