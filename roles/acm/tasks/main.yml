@@ -24,12 +24,21 @@
 - name: Print when MCH already installed
   ansible.builtin.debug:
     msg: "MultiClusterHub already installed. Skipping the deployment."
-  when: not deploy_mch | bool
+  when:
+    - state == "present"
+    - not deploy_mch | bool
 
 - name: Deploy ACM
   ansible.builtin.include_tasks:
     file: deploy.yml
-  when: deploy_mch | bool
+  when:
+    - state == "present"
+    - deploy_mch | bool
+
+- name: Destroy ACM
+  ansible.builtin.include_tasks:
+    file: destroy.yml
+  when: state == "absent"
 
 - block:
     - name: Fetch MultiClusterHub console url
@@ -46,15 +55,21 @@
     - name: Define cluster console url
       ansible.builtin.set_fact:
         cluster_console: "{{ acm_route.resources[0].status.ingress[0].host }}"
-  when: cluster_console is not defined
+  when:
+    - state == "present"
+    - cluster_console is not defined
 
-- name: Print MultiClusterHub details
+- name: Print final state message
   vars:
     msg: |
+      {%- if state == "present" -%}
       Deployment of MultiClusterHub succeeded.
 
       Cluster details:
       Cluster console: {{ cluster_console }}
       Cluster api: {{ cluster_api }}
+      {%- elif state == "absent" -%}
+      The MultiClusterHub uninstall has been finished
+      {%- endif -%}
   ansible.builtin.debug:
     msg: "{{ msg.split('\n') }}"
