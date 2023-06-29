@@ -40,6 +40,7 @@
     api_key: "{{ cluster_api_token }}"
     validate_certs: no
     definition: "{{ lookup('template', 'image-content-source-policy.yaml.j2') | from_yaml }}"
+    state: present
 
 - name: Create OperatorGroup
   community.okd.k8s:
@@ -47,6 +48,7 @@
     api_key: "{{ cluster_api_token }}"
     validate_certs: no
     definition: "{{ lookup('template', 'operator-group.yaml.j2') | from_yaml }}"
+    state: present
 
 - name: Create ACM CatalogSource
   community.okd.k8s:
@@ -54,6 +56,7 @@
     api_key: "{{ cluster_api_token }}"
     validate_certs: no
     definition: "{{ lookup('template', 'catalog-source.yaml.j2') | from_yaml }}"
+    state: present
   loop: "{{ catalog_sources }}"
 
 - name: Wait for ACM CatalogSource to get READY state
@@ -77,6 +80,7 @@
     api_key: "{{ cluster_api_token }}"
     validate_certs: no
     definition: "{{ lookup('template', 'subscription.yaml.j2') | from_yaml }}"
+    state: present
 
 - name: Fetch the name of installed ClusterServiceVersion
   kubernetes.core.k8s_info:
@@ -116,6 +120,7 @@
     api_key: "{{ cluster_api_token }}"
     validate_certs: no
     definition: "{{ lookup('template', 'multiclusterhub.yaml.j2') | from_yaml }}"
+    state: present
     wait: yes
     wait_timeout: 1200
     wait_condition:

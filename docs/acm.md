@@ -4,6 +4,13 @@
 The `acm` role prepares and deploys MultiClusterHub on a given OCP cluster.
 
 ## Role Variables
+#### State of the cluster
+Create or destroy the cluster.  
+The state could be 'present' or 'absent'.
+```
+state: present
+```
+
 #### ACM version
 Specify the version of ACM Hub that should be deployed.  
 Use the following format for the version: "2.8", "2.7".
