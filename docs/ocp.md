@@ -4,6 +4,33 @@
 The `ocp` role creates or destroys OpenShift based clusters.  
 The role will generate the `install-config.yaml` file based on the user input and will run the creation of the cluster by using the official `openshift-install` binary.
 
+## Support matrix
+The role supports the following platforms:
+* AWS
+* GCP
+
+## Roles output structure
+### Clusters asset files
+OCP cluster creation generates asset files that describe the cluster.  
+Those asset files are very **important**, since they will be required once we would like to destroy the cluster.  
+The files stored within the location, defined in `ocp_assets_dir` variable.
+
+Each cluster will create a directory with its name to store the assets within.
+
+### Clusters details file
+Once cluster/s deployed, the role outputs a file that contains connection details for all the clusters.  
+The file stored within the location, defined in `ocp_assets_dir` variable.  
+The file called `clusters_details.yml` and contains the following data:
+```
+#BEGIN test-cluster1 details
+test-cluster1:
+  console: https://console-openshift-console.apps.test-cluster1.example.com
+  api: https://api.test-cluster1.example.com:6443
+  pass: <cluster_pass>
+#END test-cluster1 details
+```
+Cluster details appended to the file on cluster creation and removed on deletion.
+
 ## Role default variables
 #### State of the cluster
 Create or destroy the cluster.  
