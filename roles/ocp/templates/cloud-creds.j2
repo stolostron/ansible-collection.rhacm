@@ -4,4 +4,17 @@ aws_access_key_id = {{ clusters_credentials[item.creds_type].aws_access_key_id }
 aws_secret_access_key = {{ clusters_credentials[item.creds_type].aws_secret_access_key }}
 {% elif item.creds_type == "gcp" %}
 {{ clusters_credentials[item.creds_type].os_service_account_json }}
+{% elif item.creds_type == "openstack" %}
+clouds:
+  openstack:
+    auth:
+      auth_url: {{ clusters_credentials[item.creds_type].auth_url }}
+      username: "{{ clusters_credentials[item.creds_type].username }}"
+      password: "{{ clusters_credentials[item.creds_type].password }}"
+      project_id: "{{ clusters_credentials[item.creds_type].project_id }}"
+      project_name: "{{ clusters_credentials[item.creds_type].project_name }}"
+      user_domain_name: "{{ clusters_credentials[item.creds_type].domain_name }}"
+    region_name: "{{ clusters_credentials[item.creds_type].region_name | default('regionOne') }}"
+    interface: "{{ clusters_credentials[item.creds_type].interface | default('public') }}"
+    identity_api_version: {{ clusters_credentials[item.creds_type].api_version | default(3) }}
 {% endif %}

@@ -1,27 +1,34 @@
 ---
-- name: Set filename to store the creds in
+- name: Sets credentails filename and path
   ansible.builtin.set_fact:
+    creds_path: "{%- if item.creds_type == 'aws' or item.creds_type == 'gcp' -%}
+                 {{ item.creds_type }}
+                 {%- elif item.creds_type == 'openstack' -%}
+                 config/openstack
+                 {%- endif -%}"
     creds_file: "{%- if item.creds_type == 'aws' -%}
                  credentials
                  {%- elif item.creds_type == 'gcp' -%}
                  osServiceAccount.json
+                 {%- elif item.creds_type == 'openstack' -%}
+                 clouds.yaml
                  {%- endif -%}"
 
 - name: Verify openshift cloud credentials
   ansible.builtin.stat:
-    path: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}/{{ creds_file }}"
+    path: "{{ lookup('env', 'HOME') }}/{{ creds_path }}/{{ creds_file }}"
   register: cloud_creds
 
 - block:
     - name: Create platform creds directory
       ansible.builtin.file:
-        path: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}"
+        path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}"
         mode: 0755
         state: directory
 
     - name: Create cloud credentials file
       ansible.builtin.template:
         src: cloud-creds.j2
-        dest: "{{ lookup('env', 'HOME') }}/.{{ item.creds_type }}/{{ creds_file }}"
+        dest: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
         mode: 0600
   when: not cloud_creds.stat.exists
