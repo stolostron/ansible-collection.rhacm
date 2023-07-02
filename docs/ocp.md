@@ -8,6 +8,7 @@ The role will generate the `install-config.yaml` file based on the user input an
 The role supports the following platforms:
 * AWS
 * GCP
+* Openstack
 
 ## Roles output structure
 ### Clusters asset files
@@ -86,6 +87,22 @@ clusters:
       instance_type: n1-standard-4
       project_id: gcp_project_name
     creds_type: gcp
+
+  - name: test-cluster3
+    base_domain: example.com
+    network:
+      cluster: 10.132.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.31.0.0/16
+      type: OpenShiftSDN
+    cloud:
+      platform: openstack
+      instance_type: <install_type>
+      external_network: <openstack_external_network>
+      api_floating_ip: <apiFloatingIP>
+      ingress_floating_ip: <ingressFloatingIP>
+    creds_type: openstack
+    openshift_version: "4.13"
 ```
 
 #### Clusters credentials
@@ -101,6 +118,14 @@ clusters_credentials:
       {
         ...content of osServiceAccount.json...
       }
+
+  osp:
+    auth_url: <openstack_api_url>
+    username: <openstack_username>
+    password: <openstack_password>
+    project_id: <openstack_project_id>
+    project_name: <openstack_project_name>
+    domain_name: <openstack_domain_name>
 ```
 
 #### Openshift version
