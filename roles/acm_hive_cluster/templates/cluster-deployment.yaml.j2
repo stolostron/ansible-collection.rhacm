@@ -16,6 +16,8 @@ metadata:
     region: {{ item.region }}
 {% elif item.platform == "vmw" %}
     cloud: 'vSphere'
+{% elif item.platform == "openstack" %}
+    cloud: 'OpenStack'
 {% endif %}
     vendor: OpenShift
 spec:
@@ -45,6 +47,11 @@ spec:
       datacenter: {{ creds.datacenter }}
       defaultDatastore: {{ creds.default_datastore }}
       network: {{ item.network_name }}
+{% elif item.platform == "openstack" %}
+    openstack:
+      cloud: openstack
+      certificatesSecretRef:
+        name: {{ item.name }}-openstack-trust
 {% endif %}
       credentialsSecretRef:
         name: {{ item.name }}-{{ item.credentials }}

@@ -20,5 +20,8 @@ spec:
 {% elif item.platform == "vmw" %}
     vsphere:
       {{ item.worker_resource | default(platform_resources.vmw.worker_resource) | to_nice_yaml | indent(6) -}}
+{% elif item.platform == "openstack" %}
+    openstack:
+      {{ item.worker_resource | default(platform_resources.openstack.worker_resource) | to_nice_yaml | indent(6) | replace("type", "flavor") -}}
 {% endif %}
   replicas: 3
