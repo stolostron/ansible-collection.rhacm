@@ -18,6 +18,7 @@ ssh_key: |
 # OCP role
 ###########
 clusters:
+  # AWS cluster
   - name: cluster1
     base_domain: <cluster_base_domain>
     network:
@@ -31,6 +32,7 @@ clusters:
       instance_type: m5.xlarge
     creds_type: aws
     openshift_version: "4.12"  # Optional. If not specified, will deploy the latest stable version
+  # GCP cluster
   - name: cluster2
     base_domain: <cluster_base_domain>
     network:
@@ -44,16 +46,42 @@ clusters:
       instance_type: n1-standard-4
       project_id: gcp_project_name
     creds_type: gcp
+  # Openstack cluster
+  - name: cluster3
+    base_domain: example.com
+    network:
+      cluster: 10.132.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.31.0.0/16
+      type: OpenShiftSDN
+    cloud:
+      platform: openstack
+      instance_type: <install_type>
+      external_network: <openstack_external_network>
+      api_floating_ip: <apiFloatingIP>
+      ingress_floating_ip: <ingressFloatingIP>
+    creds_type: openstack
+    openshift_version: "4.13"
 
 clusters_credentials:
+  # AWS credentials
   aws:
     aws_access_key_id: <aws_access_key_id>
     aws_secret_access_key: <aws_secret_access_key>
+  # GCP credentials
   gcp:
     os_service_account_json: |
       {
         ...content of osServiceAccount.json...
       }
+  # Openstack credentials
+  openstack:
+    auth_url: <openstack_api_url>
+    username: <openstack_username>
+    password: <openstack_password>
+    project_id: <openstack_project_id>
+    project_name: <openstack_project_name>
+    domain_name: <openstack_domain_name>
 
 ###########
 # ACM role
@@ -76,6 +104,7 @@ registry_secrets:
 ########################
 
 acm_hive_clusters:
+  # AWS cluster
   - name: cluster-aws
     credentials: aws-creds
     platform: aws
@@ -86,6 +115,7 @@ acm_hive_clusters:
       service: 172.30.0.0/16
       type: OVNKubernetes
     hive_cluster_version: "4.12"  # Takes the latest available image
+  # GCP cluster
   - name: cluster-gcp
     credentials: gcp-creds
     platform: gcp
@@ -96,6 +126,8 @@ acm_hive_clusters:
       service: 172.30.0.0/16
       type: OpenShiftSDN
     hive_cluster_version: "4.11"
+    fips: true  # Optional variable to enable FIPS on cluster
+  # Azure cluster
   - name: cluster-azure
     credentials: azure-creds
     platform: azr
@@ -107,7 +139,8 @@ acm_hive_clusters:
       type: OVNKubernetes
     # Specific image could be specified instead of "hive_cluster_version"
     hive_cluster_image: quay.io/openshift-release-dev/ocp-release:4.12.7-multi
-  - name: cluster_vsphere
+  # vSphere cluster
+  - name: cluster-vsphere
     credentials: vmware-creds
     platform: vmw
     network:
@@ -119,14 +152,29 @@ acm_hive_clusters:
     network_api_vip: "<vsphere_api_vip>"
     network_ingress_vip: "<vsphere_ingress_vip>"
     hive_cluster_version: "4.11"
+  # Openstack cluster
+  - name: cluster-openstack
+    credentials: openstack-creds
+    platform: openstack
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    external_network: <openstack_external_network>
+    api_floating_ip: <cluster_floating_ip>
+    ingress_floating_ip: <cluster_ingress_floating_ip>
+    hive_cluster_version: "4.13"
 
 acm_hive_clusters_credentials:
+  # AWS credentials
   - name: aws-creds
     platform: aws
     namespace: <namespace_to_keep_the_credentials>
     base_domain: <cluster_base_domain>
     aws_access_key_id: <aws_access_key_id>
     aws_secret_access_key: <aws_secret_access_key>
+  # GCP credentials
   - name: gcp-creds
     platform: gcp
     namespace: <namespace_to_keep_the_credentials>
@@ -134,6 +182,7 @@ acm_hive_clusters_credentials:
     project_id: <project_id>
     os_service_account_json: |
       <os_service_account_json>
+  # Azure credentials
   - name: azure-creds
     platform: azr
     namespace: <namespace_to_keep_the_credentials>
@@ -142,6 +191,7 @@ acm_hive_clusters_credentials:
     cloud_name: <azure_cloud_name>
     os_service_principal_json: |
       <os_service_principal_json>
+  # vSphere credentials
   - name: vmware-creds
     platform: vmw
     namespace: <namespace_to_keep_the_credentials>
@@ -154,3 +204,14 @@ acm_hive_clusters_credentials:
     default_datastore: <vcenter_datastore_name>
     cacertificate: |
         <vcenter_ca_certificate>
+  # Openstack credentials
+  - name: openstack-creds
+    platform: openstack
+    namespace: <namespace_to_keep_the_credentials>
+    base_domain: <cluster_base_domain>
+    auth_url: <openstack_api_url>
+    username: "<username>"
+    password: "<password>"
+    project_id: "<openstack_project_id>"
+    project_name: "<openstack_porject_name>"
+    domain_name: <openstack_domain_name>

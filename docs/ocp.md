@@ -59,6 +59,7 @@ ssh_pub_key:
 Provide the details of the clusters that needs to be deployed.
 ```
 clusters:
+  # AWS cluster
   - name: test-cluster1
     base_domain: example.com
     network:
@@ -74,6 +75,7 @@ clusters:
     openshift_version: "4.12"  # Optional variable to set OCP version per cluster
     fips: true  # Optional variable to enable FIPS on cluster
 
+  # GCP cluster
   - name: test-cluster2
     base_domain: example.com
     network:
@@ -88,6 +90,7 @@ clusters:
       project_id: gcp_project_name
     creds_type: gcp
 
+  # Openstack cluster
   - name: test-cluster3
     base_domain: example.com
     network:
@@ -109,17 +112,20 @@ clusters:
 Credentials that should be used during openshift cluster deployment
 ```
 clusters_credentials:
+  # AWS credentials
   aws:
     aws_access_key_id: <your_key_id>
     aws_secret_access_key: <your_access_key>
 
+  # GCP credentials
   gcp:
     os_service_account_json: |
       {
         ...content of osServiceAccount.json...
       }
 
-  osp:
+  # Openstack credentials
+  openstack:
     auth_url: <openstack_api_url>
     username: <openstack_username>
     password: <openstack_password>

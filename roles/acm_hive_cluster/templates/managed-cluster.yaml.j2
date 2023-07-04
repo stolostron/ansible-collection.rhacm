@@ -13,6 +13,8 @@ metadata:
     region: {{ item.region }}
 {% elif item.platform == "vmw" %}
     cloud: vSphere
+{% elif item.platform == "openstack" %}
+    cloud: OpenStack
 {% endif %}
     name: {{ item.name }}
     vendor: OpenShift

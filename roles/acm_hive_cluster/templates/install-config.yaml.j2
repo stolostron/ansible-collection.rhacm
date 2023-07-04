@@ -20,6 +20,9 @@ controlPlane:
 {% elif item.platform == "vmw" %}
     vsphere:
       {{ item.master_resource | default(platform_resources.vmw.master_resource) | to_nice_yaml | indent(6) -}}
+{% elif item.platform == "openstack" %}
+    openstack:
+      {{ item.master_resource | default(platform_resources.openstack.master_resource) | to_nice_yaml | indent(6) -}}
 {% endif %}
 compute:
 - hyperthreading: Enabled
@@ -38,6 +41,9 @@ compute:
 {% elif item.platform == "vmw" %}
     vsphere:
       {{ item.worker_resource | default(platform_resources.vmw.worker_resource) | to_nice_yaml | indent(6) -}}
+{% elif item.platform == "openstack" %}
+    openstack:
+      {{ item.worker_resource | default(platform_resources.openstack.worker_resource) | to_nice_yaml | indent(6) -}}
 {% endif %}
 networking:
   networkType: {{ item.network.type }}
@@ -72,6 +78,12 @@ platform:
     apiVIP: {{ item.network_api_vip }}
     ingressVIP: {{ item.network_ingress_vip }}
     network: {{ item.network_name }}
+{% elif item.platform == "openstack" %}
+  openstack:
+    cloud: openstack
+    externalNetwork: {{ item.external_network }}
+    apiFloatingIP: {{ item.api_floating_ip }}
+    ingressFloatingIP: {{ item.ingress_floating_ip }}
 {% endif %}
 {% if item.fips is defined %}
 fips: {{ item.fips }}

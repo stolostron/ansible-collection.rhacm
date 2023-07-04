@@ -50,3 +50,8 @@ platform_resources:
       memoryMB: 16384
       osDisk:
         diskSizeGB: 120
+  openstack:
+    master_resource:
+      type: PnTAE.CPU_4_Memory_16384_Disk_50
+    worker_resource:
+      type: PnTAE.CPU_4_Memory_16384_Disk_50
