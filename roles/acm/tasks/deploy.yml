@@ -92,7 +92,10 @@
     name: acm-operator-subscription
     namespace: "{{ acm_namespace }}"
   register: acm_subscription
-  until: "'currentCSV' in acm_subscription.resources[0].status"
+  until:
+    - acm_subscription.resources | length > 0
+    - "'status' in acm_subscription.resources[0]"
+    - "'currentCSV' in acm_subscription.resources[0].status"
   retries: 15
   delay: 10
 
