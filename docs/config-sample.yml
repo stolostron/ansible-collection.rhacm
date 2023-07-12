@@ -12,7 +12,17 @@ state: present
 pull_secret: '<pull_secret>'
 ssh_pub_key: '<ssh_pub_key>'
 ssh_key: |
-    <ssh_key>
+    -----BEGIN RSA PRIVATE KEY-----
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    -----END RSA PRIVATE KEY-----
 
 ###########
 # OCP role
@@ -69,11 +79,19 @@ clusters_credentials:
     aws_access_key_id: <aws_access_key_id>
     aws_secret_access_key: <aws_secret_access_key>
   # GCP credentials
+  # Make sure to align each line
   gcp:
     os_service_account_json: |
-      {
-        ...content of osServiceAccount.json...
-      }
+      { "type": "service_account",
+        "project_id": "...",
+        "private_key_id": "...",
+        "private_key": "...",
+        "client_email": "...",
+        "client_id": "...",
+        "auth_uri": "...",
+        "token_uri": "...",
+        "auth_provider_x509_cert_url": "...",
+        "client_x509_cert_url": "..." }
   # Openstack credentials
   openstack:
     auth_url: <openstack_api_url>
@@ -175,14 +193,25 @@ acm_hive_clusters_credentials:
     aws_access_key_id: <aws_access_key_id>
     aws_secret_access_key: <aws_secret_access_key>
   # GCP credentials
+  # Make sure to align each line of credentials
   - name: gcp-creds
     platform: gcp
     namespace: <namespace_to_keep_the_credentials>
     base_domain: <cluster_base_domain>
     project_id: <project_id>
     os_service_account_json: |
-      <os_service_account_json>
+      { "type": "service_account",
+        "project_id": "...",
+        "private_key_id": "...",
+        "private_key": "...",
+        "client_email": "...",
+        "client_id": "...",
+        "auth_uri": "...",
+        "token_uri": "...",
+        "auth_provider_x509_cert_url": "...",
+        "client_x509_cert_url": "..." }
   # Azure credentials
+  # Make sure to align each line of credentials
   - name: azure-creds
     platform: azr
     namespace: <namespace_to_keep_the_credentials>
@@ -190,7 +219,10 @@ acm_hive_clusters_credentials:
     base_domain_resource_group_name: <base_domain_resource_group_name>
     cloud_name: <azure_cloud_name>
     os_service_principal_json: |
-      <os_service_principal_json>
+      { "clientId": "...",
+        "clientSecret": "...",
+        "tenantId": "...",
+        "subscriptionId": "..." }
   # vSphere credentials
   - name: vmware-creds
     platform: vmw
@@ -203,7 +235,17 @@ acm_hive_clusters_credentials:
     datacenter: "<vcenter_datacenter_name>"
     default_datastore: <vcenter_datastore_name>
     cacertificate: |
-        <vcenter_ca_certificate>
+        -----BEGIN CERTIFICATE-----
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        -----END CERTIFICATE-----
   # Openstack credentials
   - name: openstack-creds
     platform: openstack
