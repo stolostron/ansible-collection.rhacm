@@ -11,7 +11,7 @@ ssh_pub_key:
 clusters:
   - name: test-cluster
     base_domain: example.com
-    creds_type: aws
+    credentials: aws-creds
     network:
       cluster: 10.128.0.0/14
       machine: 10.0.0.0/16
@@ -24,7 +24,8 @@ clusters:
     openshift_version: "4.12"  # Optional variable to set OCP version per cluster
 
 clusters_credentials:
-  aws:
+  - name: aws-creds
+    platform: aws
     aws_access_key_id: <your_key>
     aws_secret_access_key: <your_secret_key>
 
