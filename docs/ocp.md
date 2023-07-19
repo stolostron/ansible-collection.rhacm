@@ -62,6 +62,7 @@ clusters:
   # AWS cluster
   - name: test-cluster1
     base_domain: example.com
+    credentials: aws-creds
     network:
       cluster: 10.128.0.0/14
       machine: 10.0.0.0/16
@@ -71,13 +72,13 @@ clusters:
       platform: aws
       region: us-east-2
       instance_type: m5.xlarge
-    creds_type: aws
     openshift_version: "4.12"  # Optional variable to set OCP version per cluster
     fips: true  # Optional variable to enable FIPS on cluster
 
   # GCP cluster
   - name: test-cluster2
     base_domain: example.com
+    credentials: gcp-creds
     network:
       cluster: 10.128.0.0/14
       machine: 10.0.0.0/16
@@ -88,11 +89,11 @@ clusters:
       region: us-east1
       instance_type: n1-standard-4
       project_id: gcp_project_name
-    creds_type: gcp
 
   # Openstack cluster
   - name: test-cluster3
     base_domain: example.com
+    credentials: openstack-creds
     network:
       cluster: 10.132.0.0/14
       machine: 10.0.0.0/16
@@ -104,7 +105,6 @@ clusters:
       external_network: <openstack_external_network>
       api_floating_ip: <apiFloatingIP>
       ingress_floating_ip: <ingressFloatingIP>
-    creds_type: openstack
     openshift_version: "4.13"
 ```
 
@@ -113,19 +113,22 @@ Credentials that should be used during openshift cluster deployment
 ```
 clusters_credentials:
   # AWS credentials
-  aws:
+  - name: aws-creds
+    platform: aws
     aws_access_key_id: <your_key_id>
     aws_secret_access_key: <your_access_key>
 
   # GCP credentials
-  gcp:
+  - name: gcp-creds
+    platform: gcp
     os_service_account_json: |
       {
         ...content of osServiceAccount.json...
       }
 
   # Openstack credentials
-  openstack:
+  - name: openstack-creds
+    platform: openstack
     auth_url: <openstack_api_url>
     username: <openstack_username>
     password: <openstack_password>

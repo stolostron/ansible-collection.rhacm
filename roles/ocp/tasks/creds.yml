@@ -1,16 +1,16 @@
 ---
 - name: Sets credentails filename and path
   ansible.builtin.set_fact:
-    creds_path: "{%- if item.creds_type == 'aws' or item.creds_type == 'gcp' -%}
-                 {{ item.creds_type }}
-                 {%- elif item.creds_type == 'openstack' -%}
+    creds_path: "{%- if item.cloud.platform == 'aws' or item.cloud.platform == 'gcp' -%}
+                 {{ item.cloud.platform }}
+                 {%- elif item.cloud.platform == 'openstack' -%}
                  config/openstack
                  {%- endif -%}"
-    creds_file: "{%- if item.creds_type == 'aws' -%}
+    creds_file: "{%- if item.cloud.platform == 'aws' -%}
                  credentials
-                 {%- elif item.creds_type == 'gcp' -%}
+                 {%- elif item.cloud.platform == 'gcp' -%}
                  osServiceAccount.json
-                 {%- elif item.creds_type == 'openstack' -%}
+                 {%- elif item.cloud.platform == 'openstack' -%}
                  clouds.yaml
                  {%- endif -%}"
 
