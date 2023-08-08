@@ -1,0 +1,22 @@
+---
+- name: ARO - Fetch cluster ips for API and APPS
+  ansible.builtin.set_fact:
+    api_ip: "{{ aro_cluster_state.clusters.properties.apiserverProfile.ip }}"
+    apps_ip: "{{ aro_cluster_state.clusters.properties.ingressProfiles[0].ip }}"
+
+- name: ARO - DNS record for cluster API and APPS
+  azure.azcollection.azure_rm_dnsrecordset:
+    profile: rhacm-aro
+    relative_name: "{{ entry.name }}.{{ item.name }}"
+    resource_group: "{{ item.resource_group_name }}"
+    zone_name: "{{ item.base_domain }}"
+    record_type: A
+    time_to_live: 300
+    records:
+      - entry: "{{ entry.ip }}"
+    state: "{{ state }}"
+  loop:
+    - { name: 'api', ip: "{{ api_ip }}" }
+    - { name: '*.apps', ip: "{{ apps_ip }}" }
+  loop_control:
+    loop_var: entry

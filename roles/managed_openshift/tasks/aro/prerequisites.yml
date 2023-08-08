@@ -1,0 +1,33 @@
+---
+- name: ARO - Get subscription details
+  ansible.builtin.set_fact:
+    subscription: "{{ managed_openshift_clusters_credentials
+      | selectattr('name', 'equalto', item.credentials) | first }}"
+
+- name: Set credentials filename and path
+  ansible.builtin.set_fact:
+    creds_path: "{%- if item.platform == 'aro' -%}
+                 azure
+                 {%- endif -%}"
+    creds_file: "{%- if item.platform == 'aro' -%}
+                 credentials
+                 {%- endif -%}"
+
+- name: Create platform credentials directory
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}"
+    mode: 0755
+    state: directory
+
+- name: Create account credentials file
+  ansible.builtin.blockinfile:
+    path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
+    block: |
+      [rhacm-aro]
+      subscription_id={{ subscription.subscription_id }}
+      client_id={{ subscription.client_id }}
+      secret={{ subscription.client_secret }}
+      tenant={{ subscription.tenant_id }}
+    marker: "#{mark} rhacm-aro credentials"
+    create: true
+    state: present

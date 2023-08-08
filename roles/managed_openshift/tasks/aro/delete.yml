@@ -1,0 +1,28 @@
+---
+- name: ARO - Fetch cluster details
+  ansible.builtin.include_tasks:
+    file: check_cluster.yml
+
+- name: ARO - Delete DNS records for cluster
+  ansible.builtin.include_tasks:
+    file: dns_records.yml
+
+- name: ARO - Delete OpenShift Managed Cluster
+  azure.azcollection.azure_rm_openshiftmanagedcluster:
+    profile: rhacm-aro
+    name: "{{ item.name }}"
+    resource_group: "{{ item.name }}-rg"
+    location: "{{ item.region }}"
+    state: absent
+
+- name: ARO - Delete resource group
+  azure.azcollection.azure_rm_resourcegroup:
+    profile: rhacm-aro
+    name: "{{ item.name }}-rg"
+    location: "{{ item.region }}"
+    state: absent
+    force_delete_nonempty: true
+
+- name: ARO - Delete AD application and Service Principal
+  ansible.builtin.include_tasks:
+    file: rbac_app_and_sp.yml

@@ -1,0 +1,16 @@
+---
+- name: ARO - Init cluster state
+  ansible.builtin.set_fact:
+    cl_exists: false
+
+- name: ARO - Check if ARO cluster exists
+  azure.azcollection.azure_rm_openshiftmanagedcluster_info:
+    profile: rhacm-aro
+    name: "{{ item.name }}"
+    resource_group: "{{ item.name }}-rg"
+  register: aro_cluster_state
+
+- name: ARO - Set if cluster exists
+  ansible.builtin.set_fact:
+    cl_exists: true
+  when: aro_cluster_state.clusters

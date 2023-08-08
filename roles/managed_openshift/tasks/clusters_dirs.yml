@@ -1,0 +1,19 @@
+---
+- name: Create managed openshift working directory
+  ansible.builtin.file:
+    path: "{{ working_path }}"
+    state: directory
+    recurse: yes
+  when: state == "present"
+
+- name: Managed OCP directory for each cluster - {{ state }}
+  vars:
+    state_step: "{%- if state == 'present' -%}
+                 directory
+                 {%- elif state == 'absent' -%}
+                 absent
+                 {%- endif -%}"
+  ansible.builtin.file:
+    path: "{{ working_path }}/{{ item.name }}"
+    state: "{{ state_step }}"
+  loop: "{{ clusters_list }}"
