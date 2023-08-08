@@ -120,9 +120,9 @@ registry_secrets:
     user: "<username>"
     pass: "<password>"
 
-########################
+#########################
 # ACM HIVE CLUSTERS role
-########################
+#########################
 
 acm_hive_clusters:
   # AWS cluster
@@ -260,3 +260,36 @@ acm_hive_clusters_credentials:
     project_id: "<openstack_project_id>"
     project_name: "<openstack_porject_name>"
     domain_name: <openstack_domain_name>
+
+#########################
+# MANAGED OPENSHIFT role
+#########################
+
+managed_openshift_clusters:
+  # ARO cluster
+  - name: cluster-aro
+    platform: aro
+    base_domain: example.com
+    credentials: aro-creds
+    region: centralus
+    network:
+      cluster: 10.128.0.0/14
+      service: 172.30.0.0/16
+    resource_group_name: <resource_group_name>
+    machines:
+      master:
+        type: Standard_D8s_v3
+      worker:
+        type: Standard_D4s_v3
+        disk_size: 128
+        count: 3
+    cluster_version: "4.11.26"
+
+managed_openshift_clusters_credentials:
+  # ARO credentials
+  - name: aro-creds
+    platform: aro
+    client_id: <client_id>
+    client_secret: <client_secret>
+    tenant_id: <tenant_id>
+    subscription_id: <subscription_id>

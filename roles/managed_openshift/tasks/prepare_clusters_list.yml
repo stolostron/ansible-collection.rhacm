@@ -1,0 +1,25 @@
+---
+- name: Check for clusters existence
+  ansible.builtin.include_tasks:
+    file: "{{ item.platform }}/check_cluster.yml"
+
+- name: Create clusters list for creation
+  ansible.builtin.set_fact:
+    clusters_list: "{{ clusters_list | default([]) + [ item ] }}"
+  when:
+    - state == "present"
+    - not cl_exists
+
+- name: Create list of already existing clusters
+  ansible.builtin.set_fact:
+    existing_clusters: "{{ existing_clusters | default([]) + [ item ] }}"
+  when:
+    - state == "present"
+    - cl_exists
+
+- name: Create clusters list for deletion
+  ansible.builtin.set_fact:
+    clusters_list: "{{ clusters_list | default([]) + [ item ] }}"
+  when:
+    - state == "absent"
+    - cl_exists

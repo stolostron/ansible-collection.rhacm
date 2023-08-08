@@ -1,0 +1,62 @@
+---
+- name: Set managed openshift dir path
+  ansible.builtin.set_fact:
+    working_path: "{{ lookup('env', 'PWD') }}/{{ managed_openshift_dir }}"
+
+- name: Process prerequisites
+  ansible.builtin.include_tasks:
+    file: "{{ item.platform }}/prerequisites.yml"
+  loop: "{{ managed_openshift_clusters }}"
+
+# Init clusters_list var so in case no clusters found to be removed
+# the flol just skip all tasks and not fail.
+- name: Init clusters_list var
+  ansible.builtin.set_fact:
+    clusters_list: []
+
+- name: Prepare clusters list
+  ansible.builtin.include_tasks:
+    file: prepare_clusters_list.yml
+  loop: "{{ managed_openshift_clusters }}"
+
+- block:
+    - name: Delete cluster
+      ansible.builtin.include_tasks:
+        file: "{{ item.platform }}/delete.yml"
+      loop: "{{ clusters_list }}"
+
+    - name: Delete directories structure for destroyed clusters
+      ansible.builtin.include_tasks:
+        file: clusters_dirs.yml
+  when: state == "absent"
+
+- block:
+    - name: Process cluster
+      ansible.builtin.include_tasks:
+        file: "{{ item.platform }}/process.yml"
+      loop: "{{ clusters_list }}"
+
+    - name: Wait for cluster provision to complete
+      ansible.builtin.include_tasks:
+        file: "{{ item.platform }}/wait_for_cluster.yml"
+      loop: "{{ clusters_list }}"
+
+    - name: Create ARO DNS records
+      ansible.builtin.include_tasks:
+        file: aro/dns_records.yml
+      loop: "{{ clusters_list }}"
+      when: item.platform == 'aro'
+
+    - name: Combine newly created and existing clusters list
+      ansible.builtin.set_fact:
+        clusters_list: "{{ clusters_list | default([]) + existing_clusters | default([]) }}"
+
+    - name: Create directory structure for clusters
+      ansible.builtin.include_tasks:
+        file: clusters_dirs.yml
+
+    - name: Fetch connection details
+      ansible.builtin.include_tasks:
+        file: "{{ item.platform }}/fetch_connection_details.yml"
+      loop: "{{ clusters_list }}"
+  when: state == "present"

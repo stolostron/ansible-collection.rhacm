@@ -1,0 +1,33 @@
+- name: ARO - Get subscription details
+  ansible.builtin.set_fact:
+    subscription: "{{ managed_openshift_clusters_credentials
+      | selectattr('name', 'equalto', item.credentials) | first }}"
+
+- name: ARO - Set AD application display name and define a password
+  ansible.builtin.set_fact:
+    app_display_name: "aro-cluster-{{ item.name }}"
+
+- name: ARO - Check of AD app already exists
+  azure.azcollection.azure_rm_adapplication_info:
+    profile: rhacm-aro
+    tenant: "{{ subscription.tenant_id }}"
+  register: ad_app
+  no_log: true
+
+- name: ARO - Locate AD app ID for deletion
+  ansible.builtin.set_fact:
+    ad_state: "{{ ad_app.applications
+      | selectattr('app_display_name', 'match', app_display_name)
+      | map(attribute='app_id') | first | default() }}"
+  when: state == "absent"
+
+- name: ARO - AD application - {{ state }}
+  azure.azcollection.azure_rm_adapplication:
+    profile: rhacm-aro
+    display_name: "{{ app_display_name }}"
+    tenant: "{{ subscription.tenant_id }}"
+    app_id: "{{ ad_state if state == 'absent' else omit }}"
+    state: "{{ state }}"
+  when: (not ad_app.applications
+        | selectattr('app_display_name', 'match', app_display_name)
+        | map(attribute='app_display_name')) or (state == "absent")

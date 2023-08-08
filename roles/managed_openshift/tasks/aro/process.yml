@@ -1,0 +1,77 @@
+---
+- name: ARO - Create resource group
+  azure.azcollection.azure_rm_resourcegroup:
+    profile: rhacm-aro
+    name: "{{ item.name }}-rg"
+    location: "{{ item.region }}"
+    state: present
+    force_delete_nonempty: true
+  register: aro_resource_group
+
+- name: ARO - Create virtual network
+  azure.azcollection.azure_rm_virtualnetwork:
+    profile: rhacm-aro
+    name: "{{ item.name }}-vnet"
+    resource_group: "{{ item.name }}-rg"
+    location: "{{ item.region }}"
+    address_prefixes_cidr:
+      - "10.0.0.0/22"
+    state: present
+
+- name: ARO - Create subnet for Masters
+  azure.azcollection.azure_rm_subnet:
+    profile: rhacm-aro
+    name: "master-subnet"
+    resource_group: "{{ item.name }}-rg"
+    virtual_network_name: "{{ item.name }}-vnet"
+    address_prefix_cidr: "10.0.0.0/23"
+    service_endpoints:
+      - service: Microsoft.ContainerRegistry
+    private_endpoint_network_policies: Disabled
+    private_link_service_network_policies: Disabled
+    state: present
+  register: aro_master_subnet
+
+- name: ARO - Create subnet for Worker
+  azure.azcollection.azure_rm_subnet:
+    profile: rhacm-aro
+    name: "worker-subnet"
+    resource_group: "{{ item.name }}-rg"
+    virtual_network_name: "{{ item.name }}-vnet"
+    address_prefix: "10.0.2.0/23"
+    service_endpoints:
+      - service: Microsoft.ContainerRegistry
+    private_endpoint_network_policies: Disabled
+    private_link_service_network_policies: Enabled
+    state: present
+  register: aro_worker_subnet
+
+- name: ARO - Create RBAC premissions
+  ansible.builtin.include_tasks:
+    file: rbac.yml
+
+- name: ARO - Create cluster
+  azure.azcollection.azure_rm_openshiftmanagedcluster:
+    profile: rhacm-aro
+    name: "{{ item.name }}"
+    resource_group: "{{ item.name }}-rg"
+    location: "{{ item.region }}"
+    cluster_profile:
+      domain: "{{ item.name }}.{{ item.base_domain }}"
+      pull_secret: "{{ pull_secret | string }}"
+      version: "{{ item.cluster_version | default(omit) }}"
+    service_principal_profile:
+      client_id: "{{ app_id }}"
+      client_secret: "{{ subscription.client_secret }}"
+    network_profile:
+      pod_cidr: "{{ item.network.cluster }}"
+      service_cidr: "{{ item.network.service }}"
+    master_profile:
+      vm_size: "{{ item.machines.master.type }}"
+      subnet_id: "{{  aro_master_subnet.state.id }}"
+    worker_profiles:
+      - vm_size: "{{ item.machines.worker.type }}"
+        subnet_id: "{{ aro_worker_subnet.state.id }}"
+        disk_size: 128
+        count: 3
+    state: present

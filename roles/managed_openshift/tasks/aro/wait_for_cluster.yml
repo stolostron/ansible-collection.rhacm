@@ -1,0 +1,15 @@
+---
+- name: ARO - Wait for cluster provisioning to complete
+  azure.azcollection.azure_rm_openshiftmanagedcluster_info:
+    profile: rhacm-aro
+    name: "{{ item.name }}"
+    resource_group: "{{ item.name }}-rg"
+  register: aro_cluster_state
+  until: (aro_cluster_state.clusters.properties.provisioningState in ["Succeeded","Failed"])
+  retries: 120
+  delay: 60
+
+- name: ARO - Fail if cluster provisioning failed
+  ansible.builtin.fail:
+    msg: "ARO cluster {{ item.name }} failed to provision."
+  when: aro_cluster_state.clusters.properties.provisioningState == "Failed"

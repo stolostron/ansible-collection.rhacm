@@ -1,0 +1,22 @@
+---
+- name: ARO - Fetch cluster kubeconfig file
+  azure_rm_openshiftmanagedcluster_kubeconfig_info:
+    profile: rhacm-aro
+    name: "{{ item.name }}"
+    resource_group: "{{ item.name }}-rg"
+    path: "{{ working_path }}/{{ item.name }}/kubeconfig"
+  no_log: true
+
+- name: ARO - Fetch ARO cluster admin credentials
+  azure_rm_openshiftmanagedcluster_credentials_info:
+    profile: rhacm-aro
+    name: "{{ item.name }}"
+    resource_group: "{{ item.name }}-rg"
+  register: cl_creds
+  no_log: true
+
+- ansible.builtin.copy:
+    content: |
+      username: {{ cl_creds['credentials']['kubeadminUsername'] }}
+      password: {{ cl_creds['credentials']['kubeadminPassword'] }}
+    dest: "{{ working_path }}/{{ item.name }}/kubeadmin-credentials"
