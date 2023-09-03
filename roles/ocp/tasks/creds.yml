@@ -9,26 +9,28 @@
     creds_file: "{%- if item.cloud.platform == 'aws' -%}
                  credentials
                  {%- elif item.cloud.platform == 'gcp' -%}
-                 osServiceAccount.json
+                 gcp-service-account-rhacm-automation.json
                  {%- elif item.cloud.platform == 'openstack' -%}
                  clouds.yaml
                  {%- endif -%}"
 
-- name: Verify openshift cloud credentials
-  ansible.builtin.stat:
-    path: "{{ lookup('env', 'HOME') }}/{{ creds_path }}/{{ creds_file }}"
-  register: cloud_creds
+- name: Create platform creds directory
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}"
+    mode: 0755
+    state: directory
 
-- block:
-    - name: Create platform creds directory
-      ansible.builtin.file:
-        path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}"
-        mode: 0755
-        state: directory
+- name: Create cloud credentials file for GCP cloud
+  ansible.builtin.template:
+    src: cloud-creds.j2
+    dest: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
+    mode: 0600
+  when: item.cloud.platform == 'gcp'
 
-    - name: Create cloud credentials file
-      ansible.builtin.template:
-        src: cloud-creds.j2
-        dest: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
-        mode: 0600
-  when: not cloud_creds.stat.exists
+- name: Create cloud credentials file
+  ansible.builtin.blockinfile:
+    block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
+    path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
+    create: yes
+    mode: 0600
+  when: item.cloud.platform != 'gcp'

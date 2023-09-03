@@ -13,6 +13,9 @@
                       {%- else -%}
                       {{ openshift_channel }}
                       {%- endif -%}"
+  environment: 
+    AWS_PROFILE: 'rhacm-automation'
+    GOOGLE_APPLICATION_CREDENTIALS: "{{ lookup('env', 'HOME') }}/.gcp/gcp-service-account-rhacm-automation.json"
   ansible.builtin.command:
     cmd: "/tmp/openshift-install-{{ ocp_version_run }} {{ cluster_state }} cluster --dir {{ working_path }}/{{ item.name }}/"
   async: 3600

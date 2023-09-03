@@ -44,7 +44,7 @@ platform:
     projectID: {{ item.cloud.project_id }}
 {% elif item.cloud.platform == "openstack" %}
   {{ item.cloud.platform }}:
-    cloud: openstack
+    cloud: rhacm-automation
     externalNetwork: {{ item.cloud.external_network }}
     apiFloatingIP: {{ item.cloud.api_floating_ip }}
     ingressFloatingIP: {{ item.cloud.ingress_floating_ip }}

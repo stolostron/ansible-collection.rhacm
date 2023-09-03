@@ -1,13 +1,13 @@
 {% set creds = clusters_credentials | selectattr('name', 'equalto', item.credentials) | first %}
 {% if creds.platform == "aws" %}
-[default]
+[rhacm-automation]
 aws_access_key_id = {{ creds.aws_access_key_id }}
 aws_secret_access_key = {{ creds.aws_secret_access_key }}
 {% elif creds.platform == "gcp" %}
 {{ creds.os_service_account_json }}
 {% elif creds.platform == "openstack" %}
 clouds:
-  openstack:
+  rhacm-automation:
     auth:
       auth_url: {{ creds.auth_url }}
       username: "{{ creds.username }}"
