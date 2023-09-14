@@ -5,7 +5,7 @@
 
 - name: ARO - Recheck the AD app if was created
   azure.azcollection.azure_rm_adapplication_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     tenant: "{{ subscription.tenant_id }}"
   register: ad_app
   no_log: true
@@ -21,7 +21,7 @@
 
 - name: ARO - Create AD Service Principal
   azure.azcollection.azure_rm_adserviceprincipal:
-    profile: rhacm-aro
+    profile: rhacm-automation
     tenant: "{{ subscription.tenant_id }}"
     app_id: "{{ app_id }}"
     state: present
@@ -34,7 +34,7 @@
 
 - name: ARO - Fetch the AD Service Principal info
   azure.azcollection.azure_rm_adserviceprincipal_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     tenant: "{{ subscription.tenant_id }}"
     app_id: "{{ app_id }}"
   register: ad_sp
@@ -45,7 +45,7 @@
 
 - name: ARO - Set AD app password
   azure.azcollection.azure_rm_adpassword:
-    profile: rhacm-aro
+    profile: rhacm-automation
     tenant: "{{ subscription.tenant_id }}"
     app_id: "{{ app_id }}"
     value: "{{ subscription.client_secret }}"
@@ -54,7 +54,7 @@
 
 - name: ARO - Fetch ARO Resource Group Contributor Role Definition Scope
   azure.azcollection.azure_rm_roledefinition_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     scope: "/subscriptions/{{ subscription.subscription_id }}"
   register: rg_contrib_role_scope
   no_log: true
@@ -68,7 +68,7 @@
 
 - name: ARO - Set ARO Subscription Contributor Role to the Service Principal
   azure.azcollection.azure_rm_roleassignment:
-    profile: rhacm-aro
+    profile: rhacm-automation
     subscription_id: "{{ subscription.subscription_id }}"
     tenant: "{{ subscription.tenant_id }}"
     scope: "/subscriptions/{{ subscription.subscription_id }}"
@@ -77,7 +77,7 @@
 
 - name: ARO - Fetch ARO Resource Group Network Contributor Role Definition Scope
   azure.azcollection.azure_rm_roledefinition_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     scope: "/subscriptions/{{ subscription.subscription_id }}/resourceGroups/{{ item.name }}-rg"
   register: rg_net_contrib_role_scope
   no_log: true
@@ -93,7 +93,7 @@
 # https://github.com/ansible-collections/azure/pull/901
 - name: ARO - Fetch AD Service Principal info
   azure_rm_adserviceprincipal_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     tenant: "{{ subscription.tenant_id }}"
     app_display_name: "Azure Red Hat OpenShift RP"
   register: aro_ad_sp
@@ -104,7 +104,7 @@
 
 - name: ARO - Granting Resource Provider Contributor access to the ARO virtual network
   azure.azcollection.azure_rm_roleassignment:
-    profile: rhacm-aro
+    profile: rhacm-automation
     scope: "/subscriptions/{{ subscription.subscription_id }}/resourceGroups/{{ item.name }}-rg/providers/Microsoft.Network/virtualNetworks/{{ item.name }}-vnet"
     assignee_object_id: "{{ aro_sp_object_id }}"
     role_definition_id: "{{ rg_net_contrib_object_id }}"

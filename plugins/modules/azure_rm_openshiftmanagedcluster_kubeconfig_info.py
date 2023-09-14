@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: azure_rm_openshiftmanagedcluster_kubeconfig_info
-version_added: '1.16.0'
+version_added: '1.17.0'
 short_description: Get admin kubeconfig of Azure Red Hat OpenShift Managed Cluster
 description:
     - get kubeconfig of Azure Red Hat OpenShift Managed Cluster instance.
@@ -187,7 +187,8 @@ class AzureRMOpenShiftManagedClustersKubeconfigInfo(AzureRMModuleBaseExt):
             file_name = os.path.basename(self.path)
             path = self.path.replace(file_name, '')
             self.log('Checking path {0}'. format(path))
-            if not os.path.isdir(path):
+            # If the "path" is not defined, it's cwd.
+            if path and not os.path.isdir(path):
                 try:
                     self.log('Attempting to makedirs {0}'. format(path))
                     os.makedirs(path)

@@ -9,7 +9,7 @@
 
 - name: ARO - Delete OpenShift Managed Cluster
   azure.azcollection.azure_rm_openshiftmanagedcluster:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "{{ item.name }}"
     resource_group: "{{ item.name }}-rg"
     location: "{{ item.region }}"
@@ -17,7 +17,7 @@
 
 - name: ARO - Delete resource group
   azure.azcollection.azure_rm_resourcegroup:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "{{ item.name }}-rg"
     location: "{{ item.region }}"
     state: absent
