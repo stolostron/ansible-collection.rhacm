@@ -5,7 +5,7 @@
 
 - name: ARO - Check if ARO cluster exists
   azure.azcollection.azure_rm_openshiftmanagedcluster_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "{{ item.name }}"
     resource_group: "{{ item.name }}-rg"
   register: aro_cluster_state

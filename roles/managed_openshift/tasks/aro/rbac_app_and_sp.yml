@@ -2,6 +2,7 @@
   ansible.builtin.set_fact:
     subscription: "{{ managed_openshift_clusters_credentials
       | selectattr('name', 'equalto', item.credentials) | first }}"
+  no_log: true
 
 - name: ARO - Set AD application display name and define a password
   ansible.builtin.set_fact:
@@ -9,7 +10,7 @@
 
 - name: ARO - Check of AD app already exists
   azure.azcollection.azure_rm_adapplication_info:
-    profile: rhacm-aro
+    profile: rhacm-automation
     tenant: "{{ subscription.tenant_id }}"
   register: ad_app
   no_log: true
@@ -23,7 +24,7 @@
 
 - name: ARO - AD application - {{ state }}
   azure.azcollection.azure_rm_adapplication:
-    profile: rhacm-aro
+    profile: rhacm-automation
     display_name: "{{ app_display_name }}"
     tenant: "{{ subscription.tenant_id }}"
     app_id: "{{ ad_state if state == 'absent' else omit }}"

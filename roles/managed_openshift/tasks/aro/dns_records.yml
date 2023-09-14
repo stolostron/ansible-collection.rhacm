@@ -6,7 +6,7 @@
 
 - name: ARO - DNS record for cluster API and APPS
   azure.azcollection.azure_rm_dnsrecordset:
-    profile: rhacm-aro
+    profile: rhacm-automation
     relative_name: "{{ entry.name }}.{{ item.name }}"
     resource_group: "{{ item.resource_group_name }}"
     zone_name: "{{ item.base_domain }}"

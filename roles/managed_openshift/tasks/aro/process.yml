@@ -1,7 +1,7 @@
 ---
 - name: ARO - Create resource group
   azure.azcollection.azure_rm_resourcegroup:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "{{ item.name }}-rg"
     location: "{{ item.region }}"
     state: present
@@ -10,7 +10,7 @@
 
 - name: ARO - Create virtual network
   azure.azcollection.azure_rm_virtualnetwork:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "{{ item.name }}-vnet"
     resource_group: "{{ item.name }}-rg"
     location: "{{ item.region }}"
@@ -20,7 +20,7 @@
 
 - name: ARO - Create subnet for Masters
   azure.azcollection.azure_rm_subnet:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "master-subnet"
     resource_group: "{{ item.name }}-rg"
     virtual_network_name: "{{ item.name }}-vnet"
@@ -34,7 +34,7 @@
 
 - name: ARO - Create subnet for Worker
   azure.azcollection.azure_rm_subnet:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "worker-subnet"
     resource_group: "{{ item.name }}-rg"
     virtual_network_name: "{{ item.name }}-vnet"
@@ -52,14 +52,14 @@
 
 - name: ARO - Create cluster
   azure.azcollection.azure_rm_openshiftmanagedcluster:
-    profile: rhacm-aro
+    profile: rhacm-automation
     name: "{{ item.name }}"
     resource_group: "{{ item.name }}-rg"
     location: "{{ item.region }}"
     cluster_profile:
       domain: "{{ item.name }}.{{ item.base_domain }}"
       pull_secret: "{{ pull_secret | string }}"
-      version: "{{ item.cluster_version | default(omit) }}"
+      version: "{{ item.openshift_version | default(omit) }}"
     service_principal_profile:
       client_id: "{{ app_id }}"
       client_secret: "{{ subscription.client_secret }}"
