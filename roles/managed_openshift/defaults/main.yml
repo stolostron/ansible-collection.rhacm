@@ -21,14 +21,28 @@ managed_openshift_clusters:
         type: Standard_D4s_v3
         disk_size: 128
         count: 3
-    cluster_version: "4.11.26"
+    openshift_version: "4.11.26"
+  - name: cluster-rosa
+    platform: rosa
+    credentials: rosa-creds
+    region: us-east-2
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+    machines:
+      worker:
+        type: m5.xlarge
+        count: 3
+    openshift_version: "4.13.6"  # Optional. If not specified, will use the latest.
 
 managed_openshift_clusters_credentials:
   - name: aro-creds
-    platform: aro
     client_id: <client_id>
     client_secret: <client_secret>
     tenant_id: <tenant_id>
     subscription_id: <subscription_id>
-
-managed_openshift_dir: logs/managed_openshift
+  - name: rosa-creds
+    aws_access_key_id: <your_key>
+    aws_secret_access_key: <your_secret_key>
+    rosa_token: <your_rosa_token>

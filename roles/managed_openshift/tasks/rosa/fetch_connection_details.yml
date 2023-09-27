@@ -1,0 +1,76 @@
+---
+- name: ROSA - Fetch cluster api and console urls
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation describe cluster --cluster {{ item.name }} -o json"
+  register: rosa_cluster_url
+
+# Admin user for ROSA cluster created once and in order to fetch its password again
+# the user should be re-created.
+- block:
+    - name: ROSA - Create admin user
+      ansible.builtin.command:
+        cmd: "{{ rosa }} --profile rhacm-automation create admin --cluster {{ item.name }} -o json"
+      register: rosa_admin
+      no_log: true
+  rescue:
+    - name: ROSA - Delete existing admin user
+      ansible.builtin.command:
+        cmd: "{{ rosa }} --profile rhacm-automation delete admin --cluster {{ item.name }} --yes"
+
+    - name: ROSA - Create admin user
+      ansible.builtin.command:
+        cmd: "{{ rosa }} --profile rhacm-automation create admin --cluster {{ item.name }} -o json"
+      register: rosa_admin
+      no_log: true
+
+- name: ROSA - Create cluster credentials file
+  ansible.builtin.copy:
+    content: |
+      console: {{ (rosa_cluster_url.stdout | from_json)['console']['url'] }}
+      api: {{ (rosa_cluster_url.stdout | from_json)['api']['url'] }}
+      username: {{ (rosa_admin.stdout | from_json)['username'] }}
+      password: {{ (rosa_admin.stdout | from_json)['password'] }}
+    dest: "{{ working_path }}/{{ item.name }}/cluster-credentials"
+
+- name: ROSA - Write cluster details into state file
+  ansible.builtin.blockinfile:
+    path: "{{ working_path }}/{{ clusters_details_file }}"
+    block: |
+      {{ item.name }}:
+        console: {{ (rosa_cluster_url.stdout | from_json)['console']['url'] }}
+        api: {{ (rosa_cluster_url.stdout | from_json)['api']['url'] }}
+        user: {{ (rosa_admin.stdout | from_json)['username'] }}
+        pass: {{ (rosa_admin.stdout | from_json)['password'] }}
+    marker: "#{mark} {{ item.name }} details"
+    create: true
+    state: present
+
+- name: ROSA - Log in to "{{ item.name }}" cluster to observe a token
+  community.okd.openshift_auth:
+    host: "{{ (rosa_cluster_url.stdout | from_json)['api']['url'] }}"
+    username: "{{ (rosa_admin.stdout | from_json)['username'] }}"
+    password: "{{ (rosa_admin.stdout | from_json)['password'] }}"
+    validate_certs: no
+    state: present
+  register: ocp_auth
+  until:
+    - "'openshift_auth' in ocp_auth"
+    - ocp_auth.openshift_auth.api_key
+  retries: 30
+  delay: 25
+  no_log: true
+
+- name: ROSA - Generate kubeconfig file for cluster
+  ansible.builtin.template:
+    src: token-kubeconfig.j2
+    dest: "{{ working_path }}/{{ item.name }}/kubeconfig"
+
+- name: ROSA - Add cluster details to the state message
+  vars:
+    msg: |
+      Deployment of {{ item.name }} cluster succeeded.
+
+      Cluster connection details could be found here: {{ working_path }}/{{ clusters_details_file }}
+      Cluster manifests files could be found here: {{ working_path }}/{{ item.name }}/
+  ansible.builtin.set_fact:
+    cl_state: "{{ cl_state | default([]) + msg.split('\n') }}"

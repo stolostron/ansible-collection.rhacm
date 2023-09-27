@@ -59,4 +59,8 @@
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/fetch_connection_details.yml"
       loop: "{{ clusters_list }}"
+
+    - name: Print clusters details
+      ansible.builtin.debug:
+        msg: "{{ cl_state }}"
   when: state == "present"

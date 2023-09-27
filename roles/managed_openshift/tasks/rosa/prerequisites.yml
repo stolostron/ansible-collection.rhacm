@@ -1,0 +1,30 @@
+---
+- name: ROSA - Get credentials
+  ansible.builtin.set_fact:
+    rosa_creds: "{{ managed_openshift_clusters_credentials
+      | selectattr('name', 'equalto', item.credentials) | first }}"
+  no_log: true
+
+- name: ROSA - Create platform credentials directory
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.aws"
+    mode: 0755
+    state: directory
+
+- name: ROSA - Create account credentials file
+  ansible.builtin.blockinfile:
+    path: "{{ lookup('env', 'HOME') }}/.aws/credentials"
+    block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
+    marker: "#{mark} rhacm-automation"
+    create: true
+    state: present
+
+- name: ROSA - Fetch ROSA binary
+  ansible.builtin.unarchive:
+    src: "{{ rosa_binary }}"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: ROSA - Set rosa binary path
+  ansible.builtin.set_fact:
+    rosa: /tmp/rosa
