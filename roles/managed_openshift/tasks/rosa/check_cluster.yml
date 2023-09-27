@@ -1,0 +1,14 @@
+---
+- name: ROSA - Init cluster state
+  ansible.builtin.set_fact:
+    cl_exists: false
+
+- name: ROSA - Check if ROSA cluster exists
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation list clusters --region {{ item.region }} -o json"
+  register: rosa_cluster_state
+
+- name: ROSA - Set if cluster exists
+  ansible.builtin.set_fact:
+    cl_exists: true
+  when: (rosa_cluster_state.stdout | from_json) | selectattr('name', 'equalto', item.name) | map(attribute='name')

@@ -1,0 +1,12 @@
+{% set creds = managed_openshift_clusters_credentials | selectattr('name', 'equalto', item.credentials) | first %}
+{% if item.platform == "aro" %}
+[rhacm-automation]
+subscription_id={{ subscription.subscription_id }}
+client_id={{ subscription.client_id }}
+secret={{ subscription.client_secret }}
+tenant={{ subscription.tenant_id }}
+{% elif item.platform == "rosa" %}
+[rhacm-automation]
+aws_access_key_id = {{ creds.aws_access_key_id }}
+aws_secret_access_key = {{ creds.aws_secret_access_key }}
+{% endif %}

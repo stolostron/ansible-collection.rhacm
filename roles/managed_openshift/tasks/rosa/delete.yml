@@ -1,0 +1,13 @@
+---
+- name: ROSA - Fetch cluster details
+  ansible.builtin.include_tasks:
+    file: check_cluster.yml
+
+- name: ROSA - Delete cluster
+  ansible.builtin.command:
+    cmd: |
+      {{ rosa }}
+      --profile rhacm-automation
+      delete cluster
+      --cluster {{ item.name }}
+      --watch --yes

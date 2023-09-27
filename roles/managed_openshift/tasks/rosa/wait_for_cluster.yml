@@ -1,0 +1,15 @@
+---
+- name: ROSA - Wait for cluster provisioning to complete
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation describe cluster --cluster {{ item.name }} -o json"
+  register: rosa_cluster_state
+  until: (rosa_cluster_state.stdout | from_json)['status']['state'] == "ready"
+  retries: 120
+  delay: 60
+  no_log: true
+
+# TODO - Move task failure here and in aro to the end of the role
+- name: ROSA - Fail if cluster provisioning failed
+  ansible.builtin.fail:
+    msg: "ROSA cluster {{ item.name }} failed to provision."
+  when: (rosa_cluster_state.stdout | from_json)['status']['state'] != "ready"

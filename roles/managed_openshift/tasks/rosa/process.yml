@@ -1,0 +1,58 @@
+---
+- name: ROSA - Login
+  ansible.builtin.command:
+    cmd: "{{ rosa }} login --token {{ rosa_creds.rosa_token }}"
+  no_log: true
+
+- name: ROSA - Verify permissions
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation verify permissions"
+  register: rosa_permissions
+
+- name: ROSA - Verify quota
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation verify quota --region {{ item.region }}"
+  register: rosa_quota
+
+- name: ROSA - Init to prepare account
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation init"
+  register: rosa_init
+
+- name: ROSA - Fail if cluster verifications failed
+  ansible.builtin.fail:
+    msg: Fail as ROSA cluster verifications failed
+  when: (rosa_permissions.rc != 0) or (rosa_quota.rc != 0) or (rosa_init.rc != 0)
+
+- name: ROSA - Fetch cluster acoount details
+  ansible.builtin.command:
+    cmd: "{{ rosa }} --profile rhacm-automation whoami"
+  register: rosa_whoami
+
+- name: ROSA - Print cluster account details
+  ansible.builtin.debug:
+    msg: "{{ rosa_whoami.stdout_lines }}"
+
+- name: ROSA - Create cluster
+  ansible.builtin.command:
+    cmd: |
+      {{ rosa }} create cluster
+      --profile rhacm-automation
+      --cluster-name {{ item.name }}
+      --region {{ item.region }}
+      --pod-cidr {{ item.network.cluster }}
+      --machine-cidr {{ item.network.machine }}
+      --service-cidr {{ item.network.service }}
+      --compute-machine-type {{ item.machines.worker.type }}
+      --replicas {{ item.machines.worker.count }}
+      --channel-group {{ item.channel_group | default('stable') }}
+      {% if item.version is defined %}
+      --version {{ item.openshift_version }}
+      {% endif %}
+      {% if item.multi_az is defined and item.multi_az | bool %}
+      --multi-az
+      {% endif %}
+      {% if item.fips is defined and item.fips | bool %}
+      --fips
+      {% endif %}
+      --yes
