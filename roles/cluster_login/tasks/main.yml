@@ -16,8 +16,8 @@
 
     - name: Set the hub to use if defined or first available
       ansible.builtin.set_fact:
-        cl_name: "{%- if cluster_name -%}
-                  {{ hub_name }}
+        cl_name: "{%- if cluster_login_name -%}
+                  {{ cluster_login_name }}
                   {%- else -%}
                   {{ cl_file | first }}
                   {%- endif -%}"

@@ -18,11 +18,11 @@ The role is able to work in one of the following states:
   ```
 
 ## Role Variables
-#### Cluster name
+#### Cluster login name
 Specify the name of the cluster to generate the login token for.  
 If the variable is not defined, the first cluster from the details file will be taken.
 ```
-cluster_name
+cluster_login_name
 ```
 
 #### Clusters details file
