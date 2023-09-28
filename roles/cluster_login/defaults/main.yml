@@ -1,5 +1,5 @@
 ---
-cluster_name:
+cluster_login_name:
 
 clusters_details_file: clusters_details.yml
 ocp_assets_dir: logs/ocp_assets
