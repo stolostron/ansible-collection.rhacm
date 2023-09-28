@@ -1,0 +1,81 @@
+---
+# Init clusters_to_import var so in case no clusters found to be imported
+# the flow just skip all tasks and not fail.
+- name: Init clusters_to_import var
+  ansible.builtin.set_fact:
+    updated_clusters_to_import_list: []
+
+- name: Locate kubeconfig file for clusters (when not explicitly defined)
+  ansible.builtin.include_tasks:
+    file: locate_kubeconfig_file.yml
+  loop: "{{ clusters_to_import }}"
+  when: item.kubeconfig is not defined
+
+- name: Update clusters import list
+  ansible.builtin.set_fact:
+    clusters_to_import: "{{ [clusters_to_import, updated_clusters_to_import_list]
+      | community.general.lists_mergeby('name', list_merge='replace') }}"
+
+- name: Create KlusterletAddonConfig for cluster import
+  community.okd.k8s:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: no
+    definition: "{{ lookup('template', 'klusterlet-addon-config.yaml.j2') | from_yaml }}"
+    state: present
+  loop: "{{ clusters_to_import }}"
+
+- name: Handle clusters import secret
+  ansible.builtin.include_tasks:
+    file: handle_import_secret.yml
+  loop: "{{ clusters_to_import }}"
+
+- name: Wait for import cluster to join
+  kubernetes.core.k8s_info:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: no
+    api_version: cluster.open-cluster-management.io/v1
+    kind: ManagedCluster
+    name: "{{ item.name }}"
+    wait: yes
+    wait_timeout: 900
+    wait_condition:
+      type: ManagedClusterJoined
+      status: True
+  loop: "{{ clusters_to_import }}"
+
+- name: Wait for import cluster to become available
+  kubernetes.core.k8s_info:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: no
+    api_version: cluster.open-cluster-management.io/v1
+    kind: ManagedCluster
+    name: "{{ item.name }}"
+    wait: yes
+    wait_timeout: 900
+    wait_condition:
+      type: ManagedClusterConditionAvailable
+      status: True
+  loop: "{{ clusters_to_import }}"
+
+- name: Add cluster kubeconfig file to the hub
+  community.okd.k8s:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: no
+    definition: "{{ lookup('template', 'kubeconfig-secret.yaml.j2') | from_yaml }}"
+    state: present
+  loop: "{{ clusters_to_import }}"
+  no_log: true
+
+- name: Add cluster cloud credential secret to the hub (if defined)
+  community.okd.k8s:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: no
+    definition: "{{ lookup('template', 'cloud-secret.yaml.j2') | from_yaml }}"
+    state: present
+  loop: "{{ clusters_to_import }}"
+  when: item.cloud_creds is defined
