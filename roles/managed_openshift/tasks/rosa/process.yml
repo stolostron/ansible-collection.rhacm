@@ -6,7 +6,7 @@
 
 - name: ROSA - Verify permissions
   ansible.builtin.command:
-    cmd: "{{ rosa }} --profile rhacm-automation verify permissions"
+    cmd: "{{ rosa }} --profile rhacm-automation verify permissions --region {{ item.region }}"
   register: rosa_permissions
 
 - name: ROSA - Verify quota
@@ -16,7 +16,7 @@
 
 - name: ROSA - Init to prepare account
   ansible.builtin.command:
-    cmd: "{{ rosa }} --profile rhacm-automation init"
+    cmd: "{{ rosa }} --profile rhacm-automation init --region {{ item.region }}"
   register: rosa_init
 
 - name: ROSA - Fail if cluster verifications failed
@@ -26,7 +26,7 @@
 
 - name: ROSA - Fetch cluster acoount details
   ansible.builtin.command:
-    cmd: "{{ rosa }} --profile rhacm-automation whoami"
+    cmd: "{{ rosa }} --profile rhacm-automation whoami --region {{ item.region }}"
   register: rosa_whoami
 
 - name: ROSA - Print cluster account details

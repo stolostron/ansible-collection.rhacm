@@ -1,7 +1,12 @@
 ---
 - name: ROSA - Wait for cluster provisioning to complete
   ansible.builtin.command:
-    cmd: "{{ rosa }} --profile rhacm-automation describe cluster --cluster {{ item.name }} -o json"
+    cmd: |
+      {{ rosa }} --profile rhacm-automation
+      describe cluster
+      --cluster {{ item.name }}
+      --region {{ item.region }}
+      -o json
   register: rosa_cluster_state
   until: (rosa_cluster_state.stdout | from_json)['status']['state'] == "ready"
   retries: 120

@@ -3,6 +3,11 @@
   ansible.builtin.set_fact:
     cl_exists: false
 
+- name: ROSA - Login
+  ansible.builtin.command:
+    cmd: "{{ rosa }} login --token {{ rosa_creds.rosa_token }}"
+  no_log: true
+
 - name: ROSA - Check if ROSA cluster exists
   ansible.builtin.command:
     cmd: "{{ rosa }} --profile rhacm-automation list clusters --region {{ item.region }} -o json"
