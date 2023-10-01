@@ -24,7 +24,7 @@ tags: [
 ]
 
 dependencies:
-  kubernetes.core: '>=2.4.0'
-  community.okd: '>=2.3.0'
-  azure.azcollection: '>=1.16.0'
+  kubernetes.core: '==2.4.0'
+  community.okd: '==2.3.0'
+  azure.azcollection: '==1.16.0'
 
