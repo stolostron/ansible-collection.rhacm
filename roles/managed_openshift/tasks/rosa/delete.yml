@@ -10,4 +10,5 @@
       --profile rhacm-automation
       delete cluster
       --cluster {{ item.name }}
+      --region {{ item.region }}
       --watch --yes

@@ -15,7 +15,6 @@
   ansible.builtin.blockinfile:
     path: "{{ lookup('env', 'HOME') }}/.aws/credentials"
     block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
-    marker: "#{mark} rhacm-automation"
     create: true
     state: present
 
