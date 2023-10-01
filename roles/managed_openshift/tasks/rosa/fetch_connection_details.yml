@@ -1,7 +1,12 @@
 ---
 - name: ROSA - Fetch cluster api and console urls
   ansible.builtin.command:
-    cmd: "{{ rosa }} --profile rhacm-automation describe cluster --cluster {{ item.name }} -o json"
+    cmd: |
+      {{ rosa }} --profile rhacm-automation
+      describe cluster
+      --cluster {{ item.name }}
+      --region {{ item.region }}
+      -o json
   register: rosa_cluster_url
 
 # Admin user for ROSA cluster created once and in order to fetch its password again
@@ -9,17 +14,32 @@
 - block:
     - name: ROSA - Create admin user
       ansible.builtin.command:
-        cmd: "{{ rosa }} --profile rhacm-automation create admin --cluster {{ item.name }} -o json"
+        cmd: |
+          {{ rosa }} --profile rhacm-automation
+          create admin
+          --cluster {{ item.name }}
+          --region {{ item.region }}
+          -o json
       register: rosa_admin
       no_log: true
   rescue:
     - name: ROSA - Delete existing admin user
       ansible.builtin.command:
-        cmd: "{{ rosa }} --profile rhacm-automation delete admin --cluster {{ item.name }} --yes"
+        cmd: |
+          {{ rosa }} --profile rhacm-automation
+          delete admin
+          --cluster {{ item.name }}
+          --region {{ item.region }}
+          --yes
 
     - name: ROSA - Create admin user
       ansible.builtin.command:
-        cmd: "{{ rosa }} --profile rhacm-automation create admin --cluster {{ item.name }} -o json"
+        cmd: |
+          {{ rosa }} --profile rhacm-automation
+          create admin
+          --cluster {{ item.name }}
+          --region {{ item.region }}
+          -o json
       register: rosa_admin
       no_log: true
 
