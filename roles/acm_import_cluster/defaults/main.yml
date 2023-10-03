@@ -1,0 +1,13 @@
+---
+state: present
+
+acm_import_clusters:
+  #- name: cluster1
+
+# Import cluster global addon flags
+acm_import_cluster_application_manager: true
+acm_import_cluster_argocd: false
+acm_import_cluster_policy_controller: true
+acm_import_cluster_search_collector: true
+acm_import_cluster_cert_policy_controller: true
+acm_import_cluster_iam_policy_controller: true

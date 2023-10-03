@@ -1,0 +1,15 @@
+{% if item.cloud_creds is defined %}
+{% set creds = clusters_credentials | selectattr('name', 'equalto', item.cloud_creds) | first %}
+{% endif %}
+clouds:
+  openstack:
+    auth:
+      auth_url: {{ item.auth_url | default(creds.auth_url) }}
+      username: "{{ item.username | default(creds.username) }}"
+      password: "{{ item.password | default(creds.password) }}"
+      project_id: "{{ item.project_id | default(creds.project_id) }}"
+      project_name: "{{ item.project_name | default(creds.project_name) }}"
+      user_domain_name: "{{ item.domain_name | default(creds.domain_name) }}"
+    region_name: "{{ item.region_name | default(creds.region_name | default('regionOne')) }}"
+    interface: "{{ item.interface | default(creds.interface | default('public')) }}"
+    identity_api_version: {{ item.api_version | default(creds.api_version | default(3)) }}
