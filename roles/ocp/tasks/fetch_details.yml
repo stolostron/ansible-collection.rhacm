@@ -32,6 +32,12 @@
     cluster_pass: "{{ cluster_pass_reg['content'] | b64decode }}"
   no_log: true
 
+- name: Copy kubeconfig file to root of cluster directory
+  ansible.builtin.copy:
+    src: "{{ working_path }}/{{ item.name }}/auth/kubeconfig"
+    dest: "{{ working_path }}/{{ item.name }}/kubeconfig"
+    mode: 0640
+
 - name: Write cluster details into state file
   ansible.builtin.blockinfile:
     path: "{{ working_path }}/{{ clusters_details_file }}"
