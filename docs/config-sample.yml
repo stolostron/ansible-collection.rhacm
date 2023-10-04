@@ -1,5 +1,6 @@
 # Those are the main variables for the deployment
 # More variables could be found within the roles
+# For all options, refer to documentation section.
 
 # Resources state. Controls if resources are created or deleted.
 # The var could be defined within config file, playbook or cli.
@@ -292,6 +293,22 @@ managed_openshift_clusters:
         count: 3
     cluster_version: "4.11.26"
 
+  # ROSA cluster
+  - name: cluster-rosa
+    platform: rosa
+    credentials: rosa-creds
+    region: us-east-2
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+    machines:
+      worker:
+        type: m5.xlarge
+        count: 3
+    openshift_version: "4.13.6"  # Optional. If not specified, will use the latest.
+    skip_tls_verify: true  # Optional. Set the flag in the kubeconfig file.
+
 managed_openshift_clusters_credentials:
   # ARO credentials
   - name: aro-creds
@@ -301,19 +318,27 @@ managed_openshift_clusters_credentials:
     tenant_id: <tenant_id>
     subscription_id: <subscription_id>
 
+  # ROSA credentials
+  - name: rosa-creds
+    aws_access_key_id: <your_key>
+    aws_secret_access_key: <your_secret_key>
+    rosa_token: <your_rosa_token>
+
 ##########################
 # ACM IMPORT CLUSTER role
 ##########################
 
 acm_import_clusters:
-  - name: cluster1
+    # Specifying the name of the cluster will set the automation to
+    # look for the cluster under "ocp" or "managed_openshift" deployments.
+  - name: cluster4
 
-  - name: cluster2
+  - name: cluster5
     # Optional. Apply cloud credentials.
     # Taken from "clusters_credentials" var of "OCP" role.
     cloud_creds: aws-creds
 
-  - name: cluster3
+  - name: cluster6
     # Optional. Define addon flags per each cluster.
     application_manager: false
     argocd: false
@@ -322,6 +347,6 @@ acm_import_clusters:
     cert_policy_controller: false
     iam_policy_controller: true
 
-  - name: cluster4
+  - name: cluster7
     # Optional. Specify kubeconfig if cluster was not deployed by `ocp` or `managed_openshift` roles
     kubeconfig: /path/to/kubeconfig
