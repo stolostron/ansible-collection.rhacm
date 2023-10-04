@@ -8,6 +8,7 @@ Name | Description
 [stolostron.rhacm.ocp](docs/ocp.md)| Deploy standalone Openshift cluster/s on different cloud platforms.
 [stolostron.rhacm.acm](docs/acm.md)| Deploy Advanced Cluster Management (ACM) platform on selected cluster.
 [stolostron.rhacm.acm_hive_cluster](docs/acm_hive_cluster.md)| Deploy ACM hive cluster/s on the hub, by the hub using hive engine.
+[stolostron.rhacm.acm_import_cluster](docs/acm_import_cluster.md)| Import Openshift cluster/s into the hub.
 [stolostron.rhacm.managed_openshift](docs/managed_openshift.md) | Deploy Managed Openshift cluster/s.
 [stolostron.rhacm.cluster_login](docs/cluster_login.md)| Create Openshift cluster login token to perform operations on the cluster.
 
