@@ -1,7 +1,8 @@
 ---
 - name: Set managed openshift dir path
   ansible.builtin.set_fact:
-    working_path: "{{ lookup('env', 'PWD') }}/{{ managed_openshift_dir }}"
+    working_path: "{{ lookup('env', 'PWD') }}/{{ main_logs_dir }}/{{ clusters_dir }}"
+    cl_details_file_path: "{{ lookup('env', 'PWD') }}/{{ main_logs_dir }}/{{ clusters_details_file }}"
 
 - name: Process prerequisites
   ansible.builtin.include_tasks:

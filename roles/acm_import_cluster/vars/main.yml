@@ -1,3 +1,4 @@
 ---
-ocp_assets_dir: logs/ocp_assets
-managed_openshift_dir: logs/managed_openshift
+clusters_dir:
+  - logs/ocp
+  - logs/managed_openshift

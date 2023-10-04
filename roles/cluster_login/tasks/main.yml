@@ -1,7 +1,7 @@
 ---
 - name: Set ocp assets path
   ansible.builtin.set_fact:
-    working_path: "{{ lookup('env', 'PWD') }}/{{ ocp_assets_dir }}"
+    working_path: "{{ lookup('env', 'PWD') }}/{{ main_logs_dir }}"
 
 - name: Check for cluster details file
   ansible.builtin.stat:

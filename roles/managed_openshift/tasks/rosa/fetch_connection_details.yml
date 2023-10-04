@@ -54,7 +54,7 @@
 
 - name: ROSA - Write cluster details into state file
   ansible.builtin.blockinfile:
-    path: "{{ working_path }}/{{ clusters_details_file }}"
+    path: "{{ cl_details_file_path }}"
     block: |
       {{ item.name }}:
         console: {{ (rosa_cluster_url.stdout | from_json)['console']['url'] }}
@@ -90,7 +90,7 @@
     msg: |
       Deployment of {{ item.name }} cluster succeeded.
 
-      Cluster connection details could be found here: {{ working_path }}/{{ clusters_details_file }}
+      Cluster connection details could be found here: {{ cl_details_file_path }}
       Cluster manifests files could be found here: {{ working_path }}/{{ item.name }}/
   ansible.builtin.set_fact:
     cl_state: "{{ cl_state | default([]) + msg.split('\n') }}"

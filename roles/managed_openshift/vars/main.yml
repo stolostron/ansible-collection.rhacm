@@ -1,5 +1,6 @@
 ---
-managed_openshift_dir: logs/managed_openshift
+main_logs_dir: logs
+clusters_dir: managed_openshift
 clusters_details_file: clusters_details.yml
 
 rosa_binary: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/rosa/latest/rosa-linux.tar.gz
