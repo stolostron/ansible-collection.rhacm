@@ -9,7 +9,8 @@
 
 - name: Set ocp assets path
   ansible.builtin.set_fact:
-    working_path: "{{ lookup('env', 'PWD') }}/{{ ocp_assets_dir }}"
+    working_path: "{{ lookup('env', 'PWD') }}/{{ main_logs_dir }}/{{ clusters_dir }}"
+    cl_details_file_path: "{{ lookup('env', 'PWD') }}/{{ main_logs_dir }}/{{ clusters_details_file }}"
 
 - name: Prepare clusters list
   ansible.builtin.include_tasks:
@@ -43,7 +44,7 @@
 
     - name: Remove clusters details from the state file
       ansible.builtin.blockinfile:
-        path: "{{ working_path }}/{{ clusters_details_file }}"
+        path: "{{ cl_details_file_path }}"
         block: ""
         marker: "#{mark} {{ item.name }} details"
         state: absent
@@ -51,12 +52,12 @@
 
     - name: Check the "{{ clusters_details_file }}" file
       ansible.builtin.stat:
-        path: "{{ working_path }}/{{ clusters_details_file }}"
+        path: "{{ cl_details_file_path }}"
       register: cl_file_state
 
     - name: Delete the "{{ clusters_details_file }}" file if empty
       ansible.builtin.file:
-        path: "{{ working_path }}/{{ clusters_details_file }}"
+        path: "{{ cl_details_file_path }}"
         state: absent
       when:
         - cl_file_state.stat.exists

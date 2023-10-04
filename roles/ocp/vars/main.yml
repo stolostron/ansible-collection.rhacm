@@ -1,5 +1,4 @@
 ---
-cluster_login_name:
-
 main_logs_dir: logs
+clusters_dir: ocp
 clusters_details_file: clusters_details.yml
