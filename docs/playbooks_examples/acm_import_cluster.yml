@@ -1,0 +1,8 @@
+---
+- name: Import OCP clusters to ACM
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - stolostron.rhacm
+  roles:
+    - acm_import_cluster
