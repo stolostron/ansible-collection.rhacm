@@ -13,15 +13,16 @@
                       {%- else -%}
                       {{ openshift_channel }}
                       {%- endif -%}"
-  environment: 
+  environment:
     AWS_PROFILE: 'rhacm-automation'
     GOOGLE_APPLICATION_CREDENTIALS: "{{ lookup('env', 'HOME') }}/.gcp/gcp-service-account-rhacm-automation.json"
-  ansible.builtin.command:
+  ansible.builtin.command: # noqa: jinja[spacing]
     cmd: "/tmp/openshift-install-{{ ocp_version_run }} {{ cluster_state }} cluster --dir {{ working_path }}/{{ item.name }}/"
   async: 3600
   poll: 0
   loop: "{{ clusters_list }}"
   register: async_results
+  changed_when: true
 
 - name: Check for OCP clusters state
   ansible.builtin.async_status:

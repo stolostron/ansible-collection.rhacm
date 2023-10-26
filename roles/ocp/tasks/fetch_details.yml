@@ -1,15 +1,15 @@
 ---
-- name: Fetch "{{ item.name }} cluster console"
+- name: Fetch console of cluster "{{ item.name }}"
   ansible.builtin.slurp:
     src: "{{ working_path }}/{{ item.name }}/.openshift_install.log"
   register: cluster_console_reg
 
-- name: Fetch "{{ item.name }}" cluster api
+- name: Fetch api of cluster "{{ item.name }}"
   ansible.builtin.slurp:
     src: "{{ working_path }}/{{ item.name }}/auth/kubeconfig"
   register: cluster_api_reg
 
-- name: Fetch "{{ item.name }}" cluster password
+- name: Fetch password of cluster password "{{ item.name }}"
   ansible.builtin.slurp:
     src: "{{ working_path }}/{{ item.name }}/auth/kubeadmin-password"
   register: cluster_pass_reg
@@ -18,13 +18,17 @@
 - name: Set OCP cluster console
   ansible.builtin.set_fact:
     cluster_console_raw: "{{ cluster_console_reg['content'] | b64decode | regex_search('web-console here: (.+)\"', '\\1') }}"
-- ansible.builtin.set_fact:
+
+- name: Set OCP cluster console
+  ansible.builtin.set_fact:
     cluster_console: "{{ cluster_console_raw[0] }}"
 
 - name: Set OCP cluster url
   ansible.builtin.set_fact:
     cluster_api_raw: "{{ cluster_api_reg['content'] | b64decode | regex_search('server: (.+)', '\\1') }}"
-- ansible.builtin.set_fact:
+
+- name: Set OCP cluster url
+  ansible.builtin.set_fact:
     cluster_api: "{{ cluster_api_raw[0] }}"
 
 - name: Set OCP cluster password
@@ -36,7 +40,7 @@
   ansible.builtin.copy:
     src: "{{ working_path }}/{{ item.name }}/auth/kubeconfig"
     dest: "{{ working_path }}/{{ item.name }}/kubeconfig"
-    mode: 0640
+    mode: '0640'
 
 - name: Write cluster details into state file
   ansible.builtin.blockinfile:
@@ -47,6 +51,7 @@
         api: {{ cluster_api }}
         pass: {{ cluster_pass }}
     marker: "#{mark} {{ item.name }} details"
+    mode: '0644'
     create: true
     state: present
 

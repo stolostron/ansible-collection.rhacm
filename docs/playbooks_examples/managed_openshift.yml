@@ -2,7 +2,5 @@
 - name: Managed Openshift
   hosts: localhost
   gather_facts: false
-  collections:
-    - stolostron.rhacm
   roles:
-    - managed_openshift
+    - stolostron.rhacm.managed_openshift

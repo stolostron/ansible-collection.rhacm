@@ -3,21 +3,25 @@
   ansible.builtin.command:
     cmd: "{{ rosa }} login --token {{ rosa_creds.rosa_token }}"
   no_log: true
+  changed_when: false
 
 - name: ROSA - Verify permissions
   ansible.builtin.command:
     cmd: "{{ rosa }} --profile rhacm-automation verify permissions --region {{ item.region }}"
   register: rosa_permissions
+  changed_when: false
 
 - name: ROSA - Verify quota
   ansible.builtin.command:
     cmd: "{{ rosa }} --profile rhacm-automation verify quota --region {{ item.region }}"
   register: rosa_quota
+  changed_when: false
 
 - name: ROSA - Init to prepare account
   ansible.builtin.command:
     cmd: "{{ rosa }} --profile rhacm-automation init --region {{ item.region }}"
   register: rosa_init
+  changed_when: false
 
 - name: ROSA - Fail if cluster verifications failed
   ansible.builtin.fail:
@@ -28,6 +32,7 @@
   ansible.builtin.command:
     cmd: "{{ rosa }} --profile rhacm-automation whoami --region {{ item.region }}"
   register: rosa_whoami
+  changed_when: false
 
 - name: ROSA - Print cluster account details
   ansible.builtin.debug:
@@ -56,3 +61,4 @@
       --fips
       {% endif %}
       --yes
+  changed_when: true

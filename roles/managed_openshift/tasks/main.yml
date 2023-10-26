@@ -20,7 +20,9 @@
     file: prepare_clusters_list.yml
   loop: "{{ managed_openshift_clusters }}"
 
-- block:
+- name: Cluster cleanup
+  when: state == "absent"
+  block:
     - name: Delete cluster
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/delete.yml"
@@ -29,9 +31,10 @@
     - name: Delete directories structure for destroyed clusters
       ansible.builtin.include_tasks:
         file: clusters_dirs.yml
-  when: state == "absent"
 
-- block:
+- name: Cluster creation
+  when: state == "present"
+  block:
     - name: Process cluster
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/process.yml"
@@ -64,4 +67,3 @@
     - name: Print clusters details
       ansible.builtin.debug:
         msg: "{{ cl_state }}"
-  when: state == "present"

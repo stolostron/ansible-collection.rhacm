@@ -12,6 +12,7 @@
   retries: 120
   delay: 60
   no_log: true
+  changed_when: false
 
 # TODO - Move task failure here and in aro to the end of the role
 - name: ROSA - Fail if cluster provisioning failed

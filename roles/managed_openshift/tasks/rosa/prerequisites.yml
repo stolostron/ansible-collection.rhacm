@@ -8,13 +8,14 @@
 - name: ROSA - Create platform credentials directory
   ansible.builtin.file:
     path: "{{ lookup('env', 'HOME') }}/.aws"
-    mode: 0755
+    mode: '0700'
     state: directory
 
 - name: ROSA - Create account credentials file
   ansible.builtin.blockinfile:
     path: "{{ lookup('env', 'HOME') }}/.aws/credentials"
     block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
+    mode: '0600'
     create: true
     state: present
 
@@ -22,7 +23,7 @@
   ansible.builtin.unarchive:
     src: "{{ rosa_binary }}"
     dest: "/tmp/"
-    remote_src: yes
+    remote_src: true
 
 - name: ROSA - Set rosa binary path
   ansible.builtin.set_fact:

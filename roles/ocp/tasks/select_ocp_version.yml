@@ -1,6 +1,6 @@
 ---
 - name: Set the version of openshift-install binary to download
-  ansible.builtin.set_fact:
+  ansible.builtin.set_fact: # noqa: jinja[spacing]
     ocp_binary_version: "{%- if item.openshift_version is defined -%}
                          {{ openshift_channel }}-{{ item.openshift_version }}
                          {%- elif openshift_version is not none -%}
@@ -22,7 +22,7 @@
   ansible.builtin.unarchive:
     src: "{{ openshift_install_url }}/{{ ocp_binary_version }}/{{ openshift_install_binary }}"
     dest: "/tmp/"
-    remote_src: yes
+    remote_src: true
     extra_opts:
       - --transform
       - s/openshift-install/openshift-install-{{ ocp_binary_version }}/

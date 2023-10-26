@@ -3,14 +3,17 @@
   ansible.builtin.file:
     path: "{{ working_path }}"
     state: directory
-    recurse: yes
+    recurse: true
+    mode: '0755'
 
-- name: Create OCP assets directory for "{{ item.name }}" cluster
+- name: Create OCP assets directory for cluster "{{ item.name }}"
   ansible.builtin.file:
     path: "{{ working_path }}/{{ item.name }}"
+    mode: '0755'
     state: directory
 
 - name: Generate install-config.yaml for OCP cluster deployment
   ansible.builtin.template:
     src: install-config.yaml.j2
     dest: "{{ working_path }}/{{ item.name }}/install-config.yaml"
+    mode: '0640'

@@ -7,7 +7,7 @@
 - name: ARO - Create platform credentials directory
   ansible.builtin.file:
     path: "{{ lookup('env', 'HOME') }}/.azure"
-    mode: 0755
+    mode: '0700'
     state: directory
 
 - name: ARO - Create account credentials file
@@ -15,5 +15,6 @@
     path: "{{ lookup('env', 'HOME') }}/.azure/credentials"
     block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
     marker: "#{mark} rhacm-automation"
+    mode: '0600'
     create: true
     state: present

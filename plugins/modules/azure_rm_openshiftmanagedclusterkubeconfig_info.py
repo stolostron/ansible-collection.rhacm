@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_openshiftmanagedcluster_kubeconfig_info
+module: azure_rm_openshiftmanagedclusterkubeconfig_info
 version_added: '1.17.0'
 short_description: Get admin kubeconfig of Azure Red Hat OpenShift Managed Cluster
 description:
@@ -33,33 +33,32 @@ options:
         type: str
 extends_documentation_fragment:
     - azure.azcollection.azure
-    - azure.azcollection.azure_tags
 author:
     - Maxim Babushkin (@maxbab)
 '''
 
 EXAMPLES = '''
-    - name: Obtain kubeconfig file of ARO cluster
-      azure_rm_openshiftmanagedcluster_kubeconfig_info:
-        name: myCluster
-        resource_group: myResourceGroup
-      register: kubeconf
+- name: Obtain kubeconfig file of ARO cluster
+  azure_rm_openshiftmanagedclusterkubeconfig_info:
+    name: myCluster
+    resource_group: myResourceGroup
+  register: kubeconf
 
-    - name: Print registered kubeconfig file
-      debug:
-        msg: "{{ kubeconf['kubeconfig'] }}"
+- name: Print registered kubeconfig file
+  debug:
+    msg: "{{ kubeconf['kubeconfig'] }}"
 
-    - name: Fetch kubeconfig and save it as mycluster_kubeconfig filename
-      azure_rm_openshiftmanagedcluster_kubeconfig_info:
-        name: myCluster
-        resource_group: myResourceGroup
-        path: ./files/mycluster_kubeconfig
+- name: Fetch kubeconfig and save it as mycluster_kubeconfig filename
+  azure_rm_openshiftmanagedclusterkubeconfig_info:
+    name: myCluster
+    resource_group: myResourceGroup
+    path: ./files/mycluster_kubeconfig
 
-    - name: Fetch kubeconfig and save it to specified directory (file will be named as kubeconfig by default)
-      azure_rm_openshiftmanagedcluster_kubeconfig_info:
-        name: myCluster
-        resource_group: myResourceGroup
-        path: ./files/
+- name: Fetch kubeconfig and save it to specified directory (file will be named as kubeconfig by default)
+  azure_rm_openshiftmanagedclusterkubeconfig_info:
+    name: myCluster
+    resource_group: myResourceGroup
+    path: ./files/
 '''
 
 RETURN = '''
@@ -77,15 +76,11 @@ import os
 import tempfile
 from ansible_collections.azure.azcollection.plugins.module_utils.azure_rm_common_ext import AzureRMModuleBaseExt
 from ansible_collections.azure.azcollection.plugins.module_utils.azure_rm_common_rest import GenericRestClient
-try:
-    from msrestazure.azure_exceptions import CloudError
-except ImportError:
-    # this is handled in azure_rm_common
-    pass
 
 
 class Actions:
     NoAction, Create, Update, Delete = range(4)
+
 
 class AzureRMOpenShiftManagedClustersKubeconfigInfo(AzureRMModuleBaseExt):
     def __init__(self):
@@ -127,7 +122,6 @@ class AzureRMOpenShiftManagedClustersKubeconfigInfo(AzureRMModuleBaseExt):
         self.mgmt_client = self.get_mgmt_svc_client(GenericRestClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
         self.results = self.get_kubeconfig()
-        
         if self.path and self.path_is_valid():
             self.write_kubeconfig_to_file()
         return self.results
@@ -159,18 +153,16 @@ class AzureRMOpenShiftManagedClustersKubeconfigInfo(AzureRMModuleBaseExt):
                                               600,
                                               30)
             results = json.loads(response.text)
-            # self.log('Response : {0}'.format(response))
-        except CloudError as e:
+        except Exception as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
         return self.format_item(results)
-
 
     def format_item(self, item):
         d = {
             'kubeconfig': item['kubeconfig'],
         }
         return d
-    
+
     def path_is_valid(self):
         if not os.path.basename(self.path):
             if os.path.isdir(self.path):
@@ -208,7 +200,7 @@ class AzureRMOpenShiftManagedClustersKubeconfigInfo(AzureRMModuleBaseExt):
             tmp_kubeconfig = tempfile.TemporaryFile(mode='w')
             tmp_kubeconfig.write(decoded_string)
             tmp_kubeconfig.seek(0)
-            
+
             if filecmp.cmp(tmp_kubeconfig.name, self.path):
                 self.log("Files are identical. No need to override.")
                 self.results['changed'] = False

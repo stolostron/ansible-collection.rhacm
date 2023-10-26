@@ -1,6 +1,6 @@
 ---
 - name: ARO - Fetch cluster kubeconfig file
-  azure_rm_openshiftmanagedcluster_kubeconfig_info:
+  azure_rm_openshiftmanagedclusterkubeconfig_info:
     profile: rhacm-automation
     name: "{{ item.name }}"
     resource_group: "{{ item.name }}-rg"
@@ -38,6 +38,7 @@
       username: {{ cl_creds['credentials']['kubeadminUsername'] }}
       password: {{ cl_creds['credentials']['kubeadminPassword'] }}
     dest: "{{ working_path }}/{{ item.name }}/cluster-credentials"
+    mode: '0644'
 
 - name: ARO - Write cluster details into state file
   ansible.builtin.blockinfile:
@@ -49,6 +50,7 @@
         user: {{ cl_creds['credentials']['kubeadminUsername'] }}
         pass: {{ cl_creds['credentials']['kubeadminPassword'] }}
     marker: "#{mark} {{ item.name }} details"
+    mode: '0644'
     create: true
     state: present
 

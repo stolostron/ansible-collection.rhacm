@@ -34,15 +34,17 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: List all Azure Red Hat OpenShift Managed Clusters for a given subscription
-    azure_rm_openshiftmanagedcluster_info:
-    - name: List all Azure Red Hat OpenShift Managed Clusters for a given resource group
-    azure_rm_openshiftmanagedcluster_info:
-        resource_group: myResourceGroup
-    - name: Get Azure Red Hat OpenShift Managed Clusters
-    azure_rm_openshiftmanagedcluster_info:
-        resource_group: myResourceGroup
-        name: myAzureFirewall
+- name: List all Azure Red Hat OpenShift Managed Clusters for a given subscription
+  azure_rm_openshiftmanagedcluster_info:
+
+- name: List all Azure Red Hat OpenShift Managed Clusters for a given resource group
+  azure_rm_openshiftmanagedcluster_info:
+    resource_group: myResourceGroup
+
+- name: Get Azure Red Hat OpenShift Managed Clusters
+  azure_rm_openshiftmanagedcluster_info:
+    resource_group: myResourceGroup
+    name: myAzureFirewall
 '''
 
 RETURN = '''

@@ -11,7 +11,7 @@ documentation: https://github.com/stolostron/ansible-collection.rhacm/docs
 issues: https://github.com/stolostron/ansible-collection.rhacm/issues
 
 authors:
-- maxbab (https://github.com/MaxBab)
+  - maxbab (https://github.com/MaxBab)
 
 tags: [
   'acm',
@@ -27,4 +27,3 @@ dependencies:
   kubernetes.core: '==2.4.0'
   community.okd: '==2.3.0'
   azure.azcollection: '==1.16.0'
-

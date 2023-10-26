@@ -1,6 +1,6 @@
 ---
 - name: Sets credentails filename and path
-  ansible.builtin.set_fact:
+  ansible.builtin.set_fact: # noqa: jinja[spacing]
     creds_path: "{%- if item.cloud.platform == 'aws' or item.cloud.platform == 'gcp' -%}
                  {{ item.cloud.platform }}
                  {%- elif item.cloud.platform == 'openstack' -%}
@@ -17,20 +17,20 @@
 - name: Create platform creds directory
   ansible.builtin.file:
     path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}"
-    mode: 0755
+    mode: '0700'
     state: directory
 
 - name: Create cloud credentials file for GCP cloud
   ansible.builtin.template:
     src: cloud-creds.j2
     dest: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
-    mode: 0600
+    mode: '0600'
   when: item.cloud.platform == 'gcp'
 
 - name: Create cloud credentials file
   ansible.builtin.blockinfile:
     block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
     path: "{{ lookup('env', 'HOME') }}/.{{ creds_path }}/{{ creds_file }}"
-    create: yes
-    mode: 0600
+    create: true
+    mode: '0600'
   when: item.cloud.platform != 'gcp'

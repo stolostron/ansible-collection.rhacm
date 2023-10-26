@@ -1,0 +1,6 @@
+---
+skip_list:
+  - var-naming[no-role-prefix]
+  - galaxy[no-changelog]
+  - galaxy[tags]
+  - galaxy[version-incorrect]
