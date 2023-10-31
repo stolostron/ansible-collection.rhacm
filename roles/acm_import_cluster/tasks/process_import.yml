@@ -20,7 +20,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'klusterlet-addon-config.yaml.j2') | from_yaml }}"
     state: present
   loop: "{{ clusters_to_import }}"
@@ -34,37 +34,37 @@
   kubernetes.core.k8s_info:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     api_version: cluster.open-cluster-management.io/v1
     kind: ManagedCluster
     name: "{{ item.name }}"
-    wait: yes
+    wait: true
     wait_timeout: 900
     wait_condition:
       type: ManagedClusterJoined
-      status: True
+      status: true
   loop: "{{ clusters_to_import }}"
 
 - name: Wait for import cluster to become available
   kubernetes.core.k8s_info:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     api_version: cluster.open-cluster-management.io/v1
     kind: ManagedCluster
     name: "{{ item.name }}"
-    wait: yes
+    wait: true
     wait_timeout: 900
     wait_condition:
       type: ManagedClusterConditionAvailable
-      status: True
+      status: true
   loop: "{{ clusters_to_import }}"
 
 - name: Add cluster kubeconfig file to the hub
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'kubeconfig-secret.yaml.j2') | from_yaml }}"
     state: present
   loop: "{{ clusters_to_import }}"
@@ -74,7 +74,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'cloud-secret.yaml.j2') | from_yaml }}"
     state: present
   loop: "{{ clusters_to_import }}"

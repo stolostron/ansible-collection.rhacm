@@ -30,7 +30,9 @@
 - name: ARO - Wait to sync the AD app with the new Service Principal
   ansible.builtin.pause:
     minutes: 1
-  when: sp_created.changed
+  when:
+    - sp_created.changed
+    - sp_created.object_id
 
 - name: ARO - Fetch the AD Service Principal info
   azure.azcollection.azure_rm_adserviceprincipal_info:
@@ -105,6 +107,7 @@
 - name: ARO - Granting Resource Provider Contributor access to the ARO virtual network
   azure.azcollection.azure_rm_roleassignment:
     profile: rhacm-automation
-    scope: "/subscriptions/{{ subscription.subscription_id }}/resourceGroups/{{ item.name }}-rg/providers/Microsoft.Network/virtualNetworks/{{ item.name }}-vnet"
+    scope: "/subscriptions/{{ subscription.subscription_id }}/resourceGroups/\
+            {{ item.name }}-rg/providers/Microsoft.Network/virtualNetworks/{{ item.name }}-vnet"
     assignee_object_id: "{{ aro_sp_object_id }}"
     role_definition_id: "{{ rg_net_contrib_object_id }}"

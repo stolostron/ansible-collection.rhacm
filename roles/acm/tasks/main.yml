@@ -11,7 +11,7 @@
   kubernetes.core.k8s_info:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     api_version: operator.open-cluster-management.io/v1
     kind: MultiClusterHub
   register: mch_state
@@ -40,12 +40,16 @@
     file: destroy.yml
   when: state == "absent"
 
-- block:
+- name: Gather MultiClusterHub console details
+  when:
+    - state == "present"
+    - cluster_console is not defined
+  block:
     - name: Fetch MultiClusterHub console url
       kubernetes.core.k8s_info:
         host: "{{ cluster_api }}"
         api_key: "{{ cluster_api_token }}"
-        validate_certs: no
+        validate_certs: false
         api_version: route.openshift.io/v1
         kind: Route
         name: console
@@ -55,9 +59,6 @@
     - name: Define cluster console url
       ansible.builtin.set_fact:
         cluster_console: "{{ acm_route.resources[0].status.ingress[0].host }}"
-  when:
-    - state == "present"
-    - cluster_console is not defined
 
 - name: Print final state message
   vars:

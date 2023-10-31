@@ -1,8 +1,6 @@
 kubernetes==25.3.0
 
 # Azure collection requirements
-# Will be used by ARO deployment in managed_openshift role
-azure-cli
 packaging
 requests[security]
 xmltodict

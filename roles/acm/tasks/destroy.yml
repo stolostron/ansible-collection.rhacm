@@ -3,7 +3,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'multiclusterhub.yaml.j2') | from_yaml }}"
     state: absent
     wait: true
@@ -13,7 +13,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'subscription.yaml.j2') | from_yaml }}"
     state: absent
     wait: true
@@ -23,7 +23,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'catalog-source.yaml.j2') | from_yaml }}"
     state: absent
     wait: true
@@ -34,7 +34,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'operator-group.yaml.j2') | from_yaml }}"
     state: absent
     wait: true
@@ -44,17 +44,17 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'image-content-source-policy.yaml.j2') | from_yaml }}"
     state: absent
     wait: true
     wait_timeout: 1200
 
-- name: Delete "{{ acm_namespace }}" namespace
+- name: Delete namespace "{{ acm_namespace }}"
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     api_version: v1
     kind: Namespace
     name: "{{ acm_namespace }}"

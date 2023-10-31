@@ -8,10 +8,12 @@
       --region {{ item.region }}
       -o json
   register: rosa_cluster_url
+  changed_when: false
 
 # Admin user for ROSA cluster created once and in order to fetch its password again
 # the user should be re-created.
-- block:
+- name: Handle ROSA user creation
+  block:
     - name: ROSA - Create admin user
       ansible.builtin.command:
         cmd: |
@@ -22,6 +24,7 @@
           -o json
       register: rosa_admin
       no_log: true
+      changed_when: true
   rescue:
     - name: ROSA - Delete existing admin user
       ansible.builtin.command:
@@ -31,6 +34,7 @@
           --cluster {{ item.name }}
           --region {{ item.region }}
           --yes
+      changed_when: true
 
     - name: ROSA - Create admin user
       ansible.builtin.command:
@@ -42,6 +46,7 @@
           -o json
       register: rosa_admin
       no_log: true
+      changed_when: true
 
 - name: ROSA - Create cluster credentials file
   ansible.builtin.copy:
@@ -51,6 +56,7 @@
       username: {{ (rosa_admin.stdout | from_json)['username'] }}
       password: {{ (rosa_admin.stdout | from_json)['password'] }}
     dest: "{{ working_path }}/{{ item.name }}/cluster-credentials"
+    mode: '0644'
 
 - name: ROSA - Write cluster details into state file
   ansible.builtin.blockinfile:
@@ -62,15 +68,16 @@
         user: {{ (rosa_admin.stdout | from_json)['username'] }}
         pass: {{ (rosa_admin.stdout | from_json)['password'] }}
     marker: "#{mark} {{ item.name }} details"
+    mode: '0644'
     create: true
     state: present
 
-- name: ROSA - Log in to "{{ item.name }}" cluster to observe a token
+- name: ROSA - Observe a token from cluster "{{ item.name }}"
   community.okd.openshift_auth:
     host: "{{ (rosa_cluster_url.stdout | from_json)['api']['url'] }}"
     username: "{{ (rosa_admin.stdout | from_json)['username'] }}"
     password: "{{ (rosa_admin.stdout | from_json)['password'] }}"
-    validate_certs: no
+    validate_certs: false
     state: present
   register: ocp_auth
   until:
@@ -84,6 +91,7 @@
   ansible.builtin.template:
     src: token-kubeconfig.j2
     dest: "{{ working_path }}/{{ item.name }}/kubeconfig"
+    mode: '0644'
 
 - name: ROSA - Add cluster details to the state message
   vars:

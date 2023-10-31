@@ -4,28 +4,28 @@
     name: cluster_login
 
 - name: Set info state
-  ansible.builtin.set_fact:
+  ansible.builtin.set_fact: # noqa: jinja[spacing]
     info_state: "{%- if state == 'present' -%}
                  Create
                  {%- elif state == 'absent' -%}
                  Destroy
                  {%- endif -%}"
 
-- name: "{{ info_state }} global credentials"
+- name: Cluster global credentials - "{{ info_state }}"
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'global-credentials.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
   loop: "{{ acm_hive_clusters_credentials }}"
   no_log: true
 
-- name: "{{ info_state }} Managed Cluster"
+- name: Managed Cluster - "{{ info_state }}"
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'managed-cluster.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
   loop: "{{ acm_hive_clusters }}"
@@ -35,69 +35,72 @@
     file: prepare_secrets.yml
   when: state == "present"
 
-- name: "{{ info_state }} cluster MachinePool"
+- name: Cluster MachinePool - "{{ info_state }}"
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'machine-pool.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
   loop: "{{ acm_hive_clusters }}"
 
-- name: "{{ info_state }} cluster KlusterletAddonConfig"
+- name: Cluster KlusterletAddonConfig - "{{ info_state }}"
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'klusterlet-addon-config.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
   loop: "{{ acm_hive_clusters }}"
 
-- name: "{{ info_state }} Cluster Deployment"
+- name: Cluster Deployment - "{{ info_state }}"
   ansible.builtin.include_tasks:
     file: cluster_deployment.yml
   loop: "{{ acm_hive_clusters }}"
 
-- block:
+- name: Wait for clusters creation flow to complete
+  when: state == "present"
+  block:
     - name: Wait for cluster provisioning to complete
       kubernetes.core.k8s_info:
         host: "{{ cluster_api }}"
         api_key: "{{ cluster_api_token }}"
-        validate_certs: no
+        validate_certs: false
         api_version: hive.openshift.io/v1
         kind: ClusterDeployment
         name: "{{ item.name }}"
         namespace: "{{ item.name }}"
-        wait: yes
+        wait: true
         wait_timeout: 3600
         wait_condition:
           type: Provisioned
-          status: True
+          status: true
       loop: "{{ acm_hive_clusters }}"
 
     - name: Wait for cluster to become ready
       kubernetes.core.k8s_info:
         host: "{{ cluster_api }}"
         api_key: "{{ cluster_api_token }}"
-        validate_certs: no
+        validate_certs: false
         api_version: hive.openshift.io/v1
         kind: ClusterDeployment
         name: "{{ item.name }}"
         namespace: "{{ item.name }}"
-        wait: yes
+        wait: true
         wait_timeout: 3600
         wait_condition:
           type: Ready
-          status: True
+          status: true
       loop: "{{ acm_hive_clusters }}"
-  when: state == "present"
 
-- block:
+- name: Wait for clusters removal flow to complete
+  when: state == "absent"
+  block:
     - name: Wait for ClusterDeployment removal
       kubernetes.core.k8s_info:
         host: "{{ cluster_api }}"
         api_key: "{{ cluster_api_token }}"
-        validate_certs: no
+        validate_certs: false
         api_version: hive.openshift.io/v1
         kind: ClusterDeployment
         name: "{{ item.name }}"
@@ -112,7 +115,7 @@
       kubernetes.core.k8s_info:
         host: "{{ cluster_api }}"
         api_key: "{{ cluster_api_token }}"
-        validate_certs: no
+        validate_certs: false
         api_version: cluster.open-cluster-management.io/v1
         kind: ManagedCluster
         name: "{{ item.name }}"
@@ -122,7 +125,6 @@
       until: mc_remove.resources | length == 0
       retries: 50
       delay: 15
-  when: state == "absent"
 
 - name: Print execution state
   vars:

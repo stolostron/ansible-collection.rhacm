@@ -7,7 +7,7 @@
   kubernetes.core.k8s_info:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     api_version: cluster.open-cluster-management.io/v1
     kind: ManagedCluster
     name: "{{ item.name }}"
@@ -22,7 +22,7 @@
 
 - name: Create clusters list to be imported
   ansible.builtin.set_fact:
-    clusters_to_import: "{{ clusters_to_import | default([]) + [ item.item ] }}"
+    clusters_to_import: "{{ clusters_to_import | default([]) + [item.item] }}"
   loop: "{{ managed_clusters_state.results }}"
   when:
     - state == "present"
@@ -30,7 +30,7 @@
 
 - name: Create clusters list to be detached
   ansible.builtin.set_fact:
-    clusters_to_import: "{{ clusters_to_import | default([]) + [ item.item ] }}"
+    clusters_to_import: "{{ clusters_to_import | default([]) + [item.item] }}"
   loop: "{{ managed_clusters_state.results }}"
   when:
     - state == "absent"
@@ -40,7 +40,7 @@
   community.okd.k8s:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     definition: "{{ lookup('template', 'managed-cluster.yaml.j2') | from_yaml }}"
     state: "{{ state }}"
   loop: "{{ clusters_to_import }}"
@@ -54,7 +54,7 @@
   kubernetes.core.k8s_info:
     host: "{{ cluster_api }}"
     api_key: "{{ cluster_api_token }}"
-    validate_certs: no
+    validate_certs: false
     api_version: cluster.open-cluster-management.io/v1
     kind: ManagedCluster
     name: "{{ item.name }}"
@@ -72,5 +72,5 @@
                    {%- elif state == 'absent' -%}
                    detached
                    {%- endif -%}"
-  ansible.builtin.debug:
+  ansible.builtin.debug: # noqa: jinja[spacing]
     msg: "The clusters have been {{ import_state }}"
