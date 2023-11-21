@@ -9,10 +9,16 @@ cluster_pass:
 
 # Specify the version in the format of "2.8", "2.7"
 acm_version: "2.8"
+# Specific snapshot param defined only for testing deployment
 snapshot:
 
 acm_namespace: open-cluster-management
 
+# If it's "false", ACM will be deployed from official RH registry
+# If it's "true", ACM will be deployed from downstream testing registry
+deploy_test_env: false
+
+# For testing deployment only
 registry_secrets:
   - name: "quay.io:443"
     user: <username>

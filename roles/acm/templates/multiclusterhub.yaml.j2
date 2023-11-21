@@ -1,6 +1,7 @@
 apiVersion: operator.open-cluster-management.io/v1
 kind: MultiClusterHub
 metadata:
+{% if deploy_test_env | bool %}
   annotations:
 {% for catalog in catalog_sources %}
 {% if catalog.type == "mce" %}
@@ -8,7 +9,12 @@ metadata:
 {% endif %}
 {% endfor %}
     mch-imageRepository: "{{ acm_registry_mirror }}"
+{% endif %}
   name: multiclusterhub
   namespace: "{{ acm_namespace }}"
+{% if deploy_test_env | bool %}
 spec:
   imagePullSecret: multiclusterhub-operator-pull-secret
+{% else %}
+spec: {}
+{% endif %}

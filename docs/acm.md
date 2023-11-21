@@ -32,6 +32,13 @@ The namespace that should be used for ACM MCH deployment.
 acm_namespace: open-cluster-management
 ```
 
+#### Deploy testing environment
+If it's "false", ACM will be deployed from official RH registry
+If it's "true", ACM will be deployed from downstream testing registry
+```
+deploy_test_env: false
+```
+
 #### Registry secrets
 During deployment of downstream MultiClusterHub, an access to internal registry is required.  
 For that we need to provide registry secrets.  
