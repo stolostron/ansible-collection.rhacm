@@ -19,16 +19,29 @@
     wait: true
     wait_timeout: 1200
 
-- name: Delete ACM CatalogSource
-  community.okd.k8s:
-    host: "{{ cluster_api }}"
-    api_key: "{{ cluster_api_token }}"
-    validate_certs: false
-    definition: "{{ lookup('template', 'catalog-source.yaml.j2') | from_yaml }}"
-    state: absent
-    wait: true
-    wait_timeout: 1200
-  loop: "{{ catalog_sources }}"
+- name: Delete testing configs
+  when: deploy_test_env | bool
+  block:
+    - name: Delete ACM CatalogSource
+      community.okd.k8s:
+        host: "{{ cluster_api }}"
+        api_key: "{{ cluster_api_token }}"
+        validate_certs: false
+        definition: "{{ lookup('template', 'catalog-source.yaml.j2') | from_yaml }}"
+        state: absent
+        wait: true
+        wait_timeout: 1200
+      loop: "{{ catalog_sources }}"
+
+    - name: Delete ImageContentSourcePolicy
+      community.okd.k8s:
+        host: "{{ cluster_api }}"
+        api_key: "{{ cluster_api_token }}"
+        validate_certs: false
+        definition: "{{ lookup('template', 'image-content-source-policy.yaml.j2') | from_yaml }}"
+        state: absent
+        wait: true
+        wait_timeout: 1200
 
 - name: Delete OperatorGroup
   community.okd.k8s:
@@ -36,16 +49,6 @@
     api_key: "{{ cluster_api_token }}"
     validate_certs: false
     definition: "{{ lookup('template', 'operator-group.yaml.j2') | from_yaml }}"
-    state: absent
-    wait: true
-    wait_timeout: 1200
-
-- name: Delete ImageContentSourcePolicy
-  community.okd.k8s:
-    host: "{{ cluster_api }}"
-    api_key: "{{ cluster_api_token }}"
-    validate_certs: false
-    definition: "{{ lookup('template', 'image-content-source-policy.yaml.j2') | from_yaml }}"
     state: absent
     wait: true
     wait_timeout: 1200

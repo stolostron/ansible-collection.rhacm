@@ -119,7 +119,12 @@ acm_version: "2.8"  # When specifying an acm version, the last available will be
 # Sets the cluster that should be used for acm hub install.
 cluster_login_name:
 
+# If it's "false", ACM will be deployed from official RH registry
+# If it's "true", ACM will be deployed from downstream testing registry
+testing_deployment: false
+
 # Define any registry secrets that are required
+# For testing deployment only
 registry_secrets:
   - name: "quay.io:443"
     user: "<username>"

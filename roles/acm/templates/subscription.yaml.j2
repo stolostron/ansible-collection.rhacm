@@ -7,9 +7,14 @@ spec:
   channel: "release-{{ acm_version }}"
   installPlanApproval: Automatic
   name: advanced-cluster-management
+{% if deploy_test_env | bool %}
 {% for catalog in catalog_sources %}
 {% if catalog.type == "acm" %}
   source: "{{ catalog.catalog_name }}"
   sourceNamespace: "{{ catalog.catalog_ns }}"
 {% endif %}
 {% endfor %}
+{% else %}
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+{% endif %}

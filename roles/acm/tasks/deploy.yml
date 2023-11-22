@@ -1,24 +1,13 @@
-# The following two tasks represent the following bash command:
-# curl -s -X GET https://quay.io/api/v1/repository/acm-d/acm-custom-registry/tag/ \
-# | jq -S '.tags[] | {name: .name} | select(.name | startswith("2.8"))' | jq -r '.name' | head -1
-- name: Fetch downstream snapshots if snapshot not provided manually
-  ansible.builtin.uri:
-    url: "{{ registry_query_url }}/?filter_tag_name=like:{{ acm_version }}"
-    method: "GET"
-    status_code: 200
-  register: snap
-  when: snapshot is none
-
-- name: Select latest downstream snapshot according to provided version
-  ansible.builtin.set_fact:
-    snapshot: "{{ snap.json.tags
-      | selectattr('name', 'match', acm_version)
-      | map(attribute='name') | first }}"
-  when: snapshot is none
-
-- name: Print selected snapshot for ACM deployment
+- name: Define ACM deployment type
+  vars:
+    msg: |
+      {%- if not deploy_test_env | bool -%}
+      Deploying ACM {{ acm_version }} from official Red Hat registry
+      {%- elif deploy_test_env | bool -%}
+      Deploying ACM {{ acm_version }} from downstream testing registries
+      {%- endif -%}
   ansible.builtin.debug:
-    msg: "ACM version '{{ acm_version }}' with '{{ snapshot }}' snapshot will be deployed"
+    msg: "{{ msg.split('\n') }}"
 
 - name: Create namespace "{{ acm_namespace }}"
   community.okd.k8s:
@@ -30,18 +19,6 @@
     name: "{{ acm_namespace }}"
     state: present
 
-- name: Update cluster pull-secret secret
-  ansible.builtin.import_tasks:
-    file: update_pull_secret.yml
-
-- name: Create ImageContentSourcePolicy
-  community.okd.k8s:
-    host: "{{ cluster_api }}"
-    api_key: "{{ cluster_api_token }}"
-    validate_certs: false
-    definition: "{{ lookup('template', 'image-content-source-policy.yaml.j2') | from_yaml }}"
-    state: present
-
 - name: Create OperatorGroup
   community.okd.k8s:
     host: "{{ cluster_api }}"
@@ -50,29 +27,10 @@
     definition: "{{ lookup('template', 'operator-group.yaml.j2') | from_yaml }}"
     state: present
 
-- name: Create ACM CatalogSource
-  community.okd.k8s:
-    host: "{{ cluster_api }}"
-    api_key: "{{ cluster_api_token }}"
-    validate_certs: false
-    definition: "{{ lookup('template', 'catalog-source.yaml.j2') | from_yaml }}"
-    state: present
-  loop: "{{ catalog_sources }}"
-
-- name: Wait for ACM CatalogSource to get READY state
-  kubernetes.core.k8s_info:
-    host: "{{ cluster_api }}"
-    api_key: "{{ cluster_api_token }}"
-    validate_certs: false
-    api_version: operators.coreos.com/v1alpha1
-    kind: CatalogSource
-    name: "{{ item.catalog_name }}"
-    namespace: "{{ item.catalog_ns }}"
-  loop: "{{ catalog_sources }}"
-  register: acm_catalog
-  until: acm_catalog.resources[0].status.connectionState.lastObservedState == "READY"
-  retries: 15
-  delay: 10
+- name: Apply testing environment configuration
+  ansible.builtin.include_tasks:
+    file: test_env_config.yml
+  when: deploy_test_env | bool
 
 - name: Create ACM Subscription
   community.okd.k8s:
