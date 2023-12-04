@@ -60,6 +60,56 @@
       status: true
   loop: "{{ clusters_to_import }}"
 
+# Starting from ACM 2.8 a ManagedClusterImportSucceeded condition type
+# has been added for the imported clusters.
+# Check for available type and if exists, verify the successful import of the cluster.
+- name: Gather clusters info to check for ManagedClusterImportSucceeded type
+  kubernetes.core.k8s_info:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: false
+    api_version: cluster.open-cluster-management.io/v1
+    kind: ManagedCluster
+    name: "{{ item.name }}"
+  loop: "{{ clusters_to_import }}"
+  register: import_succeed_type
+
+- name: Init clusters_with_import_state_type var
+  ansible.builtin.set_fact:
+    clusters_with_import_state_type: []
+
+- name: Create clusters list to check ManagedClusterImportSucceeded type
+  ansible.builtin.set_fact:
+    clusters_with_import_state_type: "{{ clusters_with_import_state_type
+      | default([]) + item.resources
+      | selectattr('metadata', 'defined')
+      | map(attribute='metadata')
+      | selectattr('name', 'defined')
+      | map(attribute='name') }}"
+  loop: "{{ import_succeed_type.results }}"
+  when: item.resources
+    | selectattr('status', 'defined')
+    | map(attribute='status')
+    | selectattr('conditions', 'defined')
+    | map(attribute='conditions')
+    | first
+    | selectattr('type', 'match', 'ManagedClusterImportSucceeded')
+
+- name: Wait for cluster to succeeded import flow
+  kubernetes.core.k8s_info:
+    host: "{{ cluster_api }}"
+    api_key: "{{ cluster_api_token }}"
+    validate_certs: false
+    api_version: cluster.open-cluster-management.io/v1
+    kind: ManagedCluster
+    name: "{{ item }}"
+    wait: true
+    wait_timeout: 900
+    wait_condition:
+      type: ManagedClusterImportSucceeded
+      status: true
+  loop: "{{ clusters_with_import_state_type }}"
+
 - name: Add cluster kubeconfig file to the hub
   community.okd.k8s:
     host: "{{ cluster_api }}"
