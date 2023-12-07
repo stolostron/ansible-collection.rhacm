@@ -1,6 +1,6 @@
 namespace: stolostron
 name: rhacm
-version: 0.0.2
+version: 0.0.3
 
 description: Red Hat Advanced Cluster Management environment deployment automation
 readme: README.md
