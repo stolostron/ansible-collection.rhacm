@@ -1,4 +1,7 @@
 ---
+# Switch from the local to collection module once upgrading
+# to a version where the module is available.
+# https://github.com/ansible-collections/azure/pull/1238
 - name: ARO - Fetch cluster kubeconfig file
   azure_rm_openshiftmanagedclusterkubeconfig_info:
     profile: rhacm-automation
