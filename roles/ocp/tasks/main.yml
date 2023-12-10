@@ -19,17 +19,17 @@
 - name: Prepare cloud credentials
   ansible.builtin.include_tasks:
     file: creds.yml
-  loop: "{{ clusters_list }}"
+  loop: "{{ ocp_clusters_list }}"
 
 - name: Prepare OCP cluster configuration
   ansible.builtin.include_tasks:
     file: prepare.yml
-  loop: "{{ clusters_list }}"
+  loop: "{{ ocp_clusters_list }}"
 
 - name: Select OpenShift version for deploy
   ansible.builtin.include_tasks:
     file: select_ocp_version.yml
-  loop: "{{ clusters_list }}"
+  loop: "{{ ocp_clusters_list }}"
 
 - name: Process OpenShift
   ansible.builtin.include_tasks:
@@ -42,7 +42,7 @@
       ansible.builtin.file:
         path: "{{ working_path }}/{{ item.name }}/"
         state: absent
-      loop: "{{ clusters_list }}"
+      loop: "{{ ocp_clusters_list }}"
 
     - name: Remove clusters details from the state file
       ansible.builtin.blockinfile:
@@ -50,7 +50,7 @@
         block: ""
         marker: "#{mark} {{ item.name }} details"
         state: absent
-      loop: "{{ clusters_list }}"
+      loop: "{{ ocp_clusters_list }}"
 
     - name: Check the file "{{ clusters_details_file }}"
       ansible.builtin.stat:
@@ -70,12 +70,12 @@
   block:
     - name: Combine newly created and existing clusters list
       ansible.builtin.set_fact:
-        clusters_list: "{{ clusters_list | default([]) + existing_clusters | default([]) }}"
+        ocp_clusters_list: "{{ ocp_clusters_list | default([]) + existing_ocp_clusters | default([]) }}"
 
     - name: Fetch OCP cluster details
       ansible.builtin.include_tasks:
         file: fetch_details.yml
-      loop: "{{ clusters_list }}"
+      loop: "{{ ocp_clusters_list }}"
 
     - name: Print clusters details
       ansible.builtin.debug:
