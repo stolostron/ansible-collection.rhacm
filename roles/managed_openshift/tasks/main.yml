@@ -9,11 +9,11 @@
     file: "{{ item.platform }}/prerequisites.yml"
   loop: "{{ managed_openshift_clusters }}"
 
-# Init clusters_list var so in case no clusters found to be removed
-# the flol just skip all tasks and not fail.
-- name: Init clusters_list var
+# Init managed_clusters_list var so in case no clusters found
+# to be removed the flow just skip all tasks and not fail.
+- name: Init managed_clusters_list var
   ansible.builtin.set_fact:
-    clusters_list: []
+    managed_clusters_list: []
 
 - name: Prepare clusters list
   ansible.builtin.include_tasks:
@@ -26,7 +26,7 @@
     - name: Delete cluster
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/delete.yml"
-      loop: "{{ clusters_list }}"
+      loop: "{{ managed_clusters_list }}"
 
     - name: Delete directories structure for destroyed clusters
       ansible.builtin.include_tasks:
@@ -38,22 +38,22 @@
     - name: Process cluster
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/process.yml"
-      loop: "{{ clusters_list }}"
+      loop: "{{ managed_clusters_list }}"
 
     - name: Wait for cluster provision to complete
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/wait_for_cluster.yml"
-      loop: "{{ clusters_list }}"
+      loop: "{{ managed_clusters_list }}"
 
     - name: Create ARO DNS records
       ansible.builtin.include_tasks:
         file: aro/dns_records.yml
-      loop: "{{ clusters_list }}"
+      loop: "{{ managed_clusters_list }}"
       when: item.platform == 'aro'
 
     - name: Combine newly created and existing clusters list
       ansible.builtin.set_fact:
-        clusters_list: "{{ clusters_list | default([]) + existing_clusters | default([]) }}"
+        managed_clusters_list: "{{ managed_clusters_list | default([]) + existing_managed_clusters | default([]) }}"
 
     - name: Create directory structure for clusters
       ansible.builtin.include_tasks:
@@ -62,7 +62,7 @@
     - name: Fetch connection details
       ansible.builtin.include_tasks:
         file: "{{ item.platform }}/fetch_connection_details.yml"
-      loop: "{{ clusters_list }}"
+      loop: "{{ managed_clusters_list }}"
 
     - name: Print clusters details
       ansible.builtin.debug:

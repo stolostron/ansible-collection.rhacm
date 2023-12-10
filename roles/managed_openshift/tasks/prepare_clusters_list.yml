@@ -5,21 +5,21 @@
 
 - name: Create clusters list for creation
   ansible.builtin.set_fact:
-    clusters_list: "{{ clusters_list | default([]) + [item] }}"
+    managed_clusters_list: "{{ managed_clusters_list | default([]) + [item] }}"
   when:
     - state == "present"
     - not cl_exists
 
 - name: Create list of already existing clusters
   ansible.builtin.set_fact:
-    existing_clusters: "{{ existing_clusters | default([]) + [item] }}"
+    existing_managed_clusters: "{{ existing_managed_clusters | default([]) + [item] }}"
   when:
     - state == "present"
     - cl_exists
 
 - name: Create clusters list for deletion
   ansible.builtin.set_fact:
-    clusters_list: "{{ clusters_list | default([]) + [item] }}"
+    managed_clusters_list: "{{ managed_clusters_list | default([]) + [item] }}"
   when:
     - state == "absent"
     - cl_exists

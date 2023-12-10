@@ -17,7 +17,7 @@
     path: "{{ working_path }}/{{ item.name }}"
     mode: '0755'
     state: "{{ state_step }}"
-  loop: "{{ clusters_list }}"
+  loop: "{{ managed_clusters_list }}"
 
 - name: Cleanup clusters entries
   when: state == "absent"
@@ -28,7 +28,7 @@
         block: ""
         marker: "#{mark} {{ item.name }} details"
         state: absent
-      loop: "{{ clusters_list }}"
+      loop: "{{ managed_clusters_list }}"
 
     - name: Check the file "{{ clusters_details_file }}"
       ansible.builtin.stat:
