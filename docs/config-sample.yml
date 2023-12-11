@@ -121,7 +121,7 @@ cluster_login_name:
 
 # If it's "false", ACM will be deployed from official RH registry
 # If it's "true", ACM will be deployed from downstream testing registry
-testing_deployment: false
+deploy_test_env: false
 
 # Define any registry secrets that are required
 # For testing deployment only
