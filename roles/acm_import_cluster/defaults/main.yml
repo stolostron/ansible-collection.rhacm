@@ -1,8 +1,8 @@
 ---
 state: present
 
-acm_import_clusters:
-  # - name: cluster1
+# acm_import_clusters:
+#   - name: cluster1
 
 # Import cluster global addon flags
 acm_import_cluster_application_manager: true
