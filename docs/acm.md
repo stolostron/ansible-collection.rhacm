@@ -19,7 +19,7 @@ acm_version: "2.8"
 ```
 
 #### Snapshot
-In order to deploy specific version of ACM, specify snapshot.  
+Optional. In order to deploy specific snapshot of ACM version, specify the snapshot.  
 Example of snapshot: `2.7.2-DOWNSTREAM-2023-03-02-21-33-34`
 **Note** - If snapshot is not specified, latest snapshot for chosen version will be selected automatically by the playbook.
 ```
