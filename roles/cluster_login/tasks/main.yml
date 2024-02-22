@@ -26,12 +26,16 @@
                   {{ cl_file | first }}
                   {%- endif -%}"
 
-    - name: Set cluster details
-      ansible.builtin.set_fact:
-        cl_api: "{{ cl_file[cl_name].api }}"
-        cl_user: "{{ cl_file[cl_name].user | default('kubeadmin') }}"
-        cl_pass: "{{ cl_file[cl_name].pass }}"
-      no_log: true
+- name: Set cluster details from the file if exists
+  ansible.builtin.set_fact:
+    cl_api: "{{ cl_file[cl_name].api }}"
+    cl_user: "{{ cl_file[cl_name].user | default('kubeadmin') }}"
+    cl_pass: "{{ cl_file[cl_name].pass }}"
+  no_log: true
+  when:
+    - cl_file_state.stat.exists
+    - cl_file_state.stat.size != 0
+    - cl_name in cl_file
 
 - name: Allocate cluster connection details
   ansible.builtin.set_fact:
