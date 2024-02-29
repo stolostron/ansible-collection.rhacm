@@ -120,7 +120,17 @@ acm_hive_clusters_credentials:
     base_domain: <cluster_base_domain>
     project_id: <project_id>
     os_service_account_json: |
-      <os_service_account_json>
+      { "type": "service_account",
+        "project_id": "...",
+        "private_key_id": "...",
+        "private_key": "...",
+        "client_email": "...",
+        "client_id": "...",
+        "client_x509_cert_url": "...",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "universe_domain": "googleapis.com" }
   # Azure credentials
   - name: azure-creds
     platform: azr
@@ -129,7 +139,10 @@ acm_hive_clusters_credentials:
     base_domain_resource_group_name: <base_domain_resource_group_name>
     cloud_name: <azure_cloud_name>
     os_service_principal_json: |
-      <os_service_principal_json>
+      { "clientId": "...",
+        "clientSecret": "...",
+        "tenantId": "...",
+        "subscriptionId": "..." }
   # vSphere credentials
   - name: vmware-creds
     platform: vmw

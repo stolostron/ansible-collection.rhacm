@@ -92,10 +92,11 @@ clusters_credentials:
         "private_key": "...",
         "client_email": "...",
         "client_id": "...",
-        "auth_uri": "...",
-        "token_uri": "...",
-        "auth_provider_x509_cert_url": "...",
-        "client_x509_cert_url": "..." }
+        "client_x509_cert_url": "...",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "universe_domain": "googleapis.com" }
   # Openstack credentials
   - name: openstack-creds
     platform: openstack
@@ -221,10 +222,11 @@ acm_hive_clusters_credentials:
         "private_key": "...",
         "client_email": "...",
         "client_id": "...",
-        "auth_uri": "...",
-        "token_uri": "...",
-        "auth_provider_x509_cert_url": "...",
-        "client_x509_cert_url": "..." }
+        "client_x509_cert_url": "...",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "universe_domain": "googleapis.com" }
   # Azure credentials
   # Make sure to align each line of credentials
   - name: azure-creds
