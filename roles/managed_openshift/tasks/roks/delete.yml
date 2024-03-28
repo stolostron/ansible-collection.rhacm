@@ -1,0 +1,63 @@
+---
+- name: ROKS - Fetch cluster details
+  ansible.builtin.include_tasks:
+    file: check_cluster.yml
+
+- name: ROKS - Destroy cluster
+  ansible.builtin.command:
+    cmd: |
+      {{ ibmcloud }} ks cluster rm
+      --cluster {{ item.name }} --force-delete-storage -f
+  changed_when: true
+
+- name: ROKS - Wait for the cluster to be deleted
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} ks cluster ls --provider vpc-gen2 --output json"
+  register: roks_cl_delete
+  until: not (roks_cl_delete.stdout | from_json) | selectattr('name', 'match', item.name)
+  retries: 120
+  delay: 60
+  changed_when: false
+
+- name: ROKS - Delete resource instance for cluster storage
+  goldyfruit.ibmcloud_automation.ic_resource_instance:
+    instance: "{{ item.name }}-storage"
+    recursive: true
+    state: absent
+
+- name: ROKS - Delete subnet
+  goldyfruit.ibmcloud_automation.ic_is_subnet:
+    subnet: "{{ item.name }}-subnet"
+    vpc: "{{ item.name }}-vpc"
+    state: absent
+
+- name: ROKS - Retrieve public gateway info
+  goldyfruit.ibmcloud_automation.ic_is_gateway_info:
+    gateway: "{{ item.name }}-gateway"
+  register: roks_gw_info
+
+- name: ROKS - Delete public gateway
+  goldyfruit.ibmcloud_automation.ic_is_gateway:
+    gateway: "{{ item.name }}-gateway"
+    resource_group: "{{ item.name }}"
+    vpc: "{{ item.name }}-vpc"
+    zone: "{{ roks_gw_info.zone.name }}"
+    state: absent
+
+- name: ROKS - Delete VPC
+  goldyfruit.ibmcloud_automation.ic_is_vpc:
+    vpc: "{{ item.name }}-vpc"
+    resource_group: "{{ item.name }}"
+    state: absent
+
+- name: ROKS - Delete resource group
+  goldyfruit.ibmcloud_automation.ic_resource_group:
+    account_id: "{{ roks_account_id }}"
+    group: "{{ item.name }}"
+    state: absent
+  register: roks_delete
+  until:
+    - "'status' in roks_delete.msg"
+    - roks_delete.msg.status == "deleted"
+  retries: 7
+  delay: 5

@@ -1,0 +1,43 @@
+---
+- name: ROKS - Get credentials
+  ansible.builtin.set_fact:
+    roks_creds: "{{ managed_openshift_clusters_credentials
+      | selectattr('name', 'equalto', item.credentials) | first }}"
+  no_log: true
+
+- name: ROKS - Get latest ibm cli version
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/IBM-Cloud/ibm-cloud-cli-release/releases/latest"
+    return_content: true
+  register: get_ibmcli
+
+- name: ROKS - Fetch ibmcloud binary
+  vars:
+    vers: "{{ get_ibmcli.json.name | replace('v', '') }}"
+  ansible.builtin.unarchive:
+    src: "{{ roks_binary_url }}/{{ vers }}/binaries/IBM_Cloud_CLI_{{ vers }}_linux_amd64.tgz"
+    dest: "/tmp/"
+    extra_opts:
+      - --strip=1
+      - --no-anchored
+      - ibmcloud
+    remote_src: true
+
+- name: ROKS - Set ibmcloud binary path
+  ansible.builtin.set_fact:
+    ibmcloud: /tmp/ibmcloud
+
+- name: ROKS - Install required plugins
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} plugin install container-service -f"
+  changed_when: true
+
+- name: ROKS - Fetch IBM cloud account details
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} account show --output json"
+  register: ibm_account_details
+  changed_when: false
+
+- name: ROKS - Set IBM cloud account ID
+  ansible.builtin.set_fact:
+    roks_account_id: "{{ (ibm_account_details.stdout | from_json).account_id }}"

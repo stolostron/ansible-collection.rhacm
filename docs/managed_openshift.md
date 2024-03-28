@@ -7,6 +7,7 @@ The `managed_openshift` role deploys or destroys Managed Openshift clusters.
 The role supports the following platforms:
 * ARO (Microsoft Azure Red Hat OpenShift)
 * ROSA (Red Hat OpenShift Service on AWS)
+* ROKS (Red Hat OpenShift Service on IBM)
 
 ## Role default variables
 #### State of the cluster
@@ -64,6 +65,17 @@ managed_openshift_clusters:
         count: 3
     openshift_version: "4.13.6"  # Optional. If not specified, will use the latest.
     skip_tls_verify: true  # Optional. Set the flag in the kubeconfig file.
+
+  # ROKS cluster
+  - name: cluster-roks
+    platform: roks
+    credentials: roks-creds
+    region: us-east
+    machines:
+      worker:
+        type: bx2.4x16
+        count: 3
+    openshift_version: "4.14"
 ```
 
 #### Clusters credentials
@@ -83,6 +95,10 @@ managed_openshift_clusters_credentials:
     aws_access_key_id: <your_key>
     aws_secret_access_key: <your_secret_key>
     rosa_token: <your_rosa_token>
+
+  # ROKS credentials
+  - name: roks-creds
+    roks_token: <your_roks_api_token>
 ```
 
 #### Managed OpenShift clusters directory

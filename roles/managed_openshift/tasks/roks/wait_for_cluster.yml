@@ -1,0 +1,21 @@
+---
+- name: ROKS - Wait for cluster provisioning to complete
+  ansible.builtin.command:
+    cmd: |
+      {{ ibmcloud }} ks cluster get
+      --cluster {{ item.name }} --output json
+  register: roks_cluster_state
+  until:
+    - (roks_cluster_state.stdout | from_json)['state'] == "normal"
+    - (roks_cluster_state.stdout | from_json)['status'] == "All Workers Normal"
+    - (roks_cluster_state.stdout | from_json)['ingress']['status'] == "healthy"
+  retries: 120
+  delay: 60
+  no_log: true
+  changed_when: false
+
+# TODO - Move task failure here and in aro to the end of the role
+- name: ROKS - Fail if cluster provisioning failed
+  ansible.builtin.fail:
+    msg: "ROKS cluster {{ item.name }} failed to provision."
+  when: (roks_cluster_state.stdout | from_json)['state'] != "normal"

@@ -1,0 +1,21 @@
+---
+- name: ROKS - Init cluster state
+  ansible.builtin.set_fact:
+    cl_exists: false
+
+- name: ROKS - Login
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} login --apikey {{ roks_creds.roks_token }} -r {{ item.region }}"
+  no_log: true
+  changed_when: false
+
+- name: ROKS - Check cluster existence
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} ks cluster ls --provider vpc-gen2 --json"
+  register: ibm_cl
+  changed_when: false
+
+- name: ROKS - Set of cluster exists
+  ansible.builtin.set_fact:
+    cl_exists: true
+  when: (ibm_cl.stdout | from_json) | selectattr('name', 'equalto', item.name) | map(attribute='name')
