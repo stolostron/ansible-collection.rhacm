@@ -1,0 +1,90 @@
+---
+- name: ROKS - Identify deployment version
+  ansible.builtin.include_tasks:
+    file: fetch_version.yml
+
+- name: ROKS - Create resource group
+  goldyfruit.ibmcloud_automation.ic_resource_group:
+    account_id: "{{ roks_account_id }}"
+    group: "{{ item.name }}"
+    state: present
+  register: roks_res_group
+
+- name: ROKS - Create VPC
+  goldyfruit.ibmcloud_automation.ic_is_vpc:
+    vpc: "{{ item.name }}-vpc"
+    resource_group: "{{ item.name }}"
+    state: present
+  register: roks_vpc
+  until:
+    - roks_vpc.msg.status == 'available'
+    - roks_vpc.msg.health_state == 'ok'
+
+- name: ROKS - Retrieve address prefix list
+  goldyfruit.ibmcloud_automation.ic_is_vpc_address_prefix_info:
+    vpc: "{{ item.name }}-vpc"
+  register: vpc_addr_prefix
+
+- name: ROKS - Set vpc address prefixes facts
+  ansible.builtin.set_fact:
+    vpc_address_prefixes_cidr: "{{ vpc_addr_prefix.address_prefixes[0].cidr }}"
+    vpc_address_prefixes_zone: "{{ vpc_addr_prefix.address_prefixes[0].zone.name }}"
+
+- name: ROKS - Create public gateway
+  goldyfruit.ibmcloud_automation.ic_is_gateway:
+    gateway: "{{ item.name }}-gateway"
+    resource_group: "{{ item.name }}"
+    vpc: "{{ item.name }}-vpc"
+    zone: "{{ vpc_address_prefixes_zone }}"
+    state: present
+  register: roks_public_gateway
+  until: roks_public_gateway.msg.status == 'available'
+
+- name: ROKS - Create subnet
+  goldyfruit.ibmcloud_automation.ic_is_subnet:
+    subnet: "{{ item.name }}-subnet"
+    resource_group: "{{ item.name }}"
+    vpc: "{{ item.name }}-vpc"
+    ipv4_cidr_block: "{{ vpc_address_prefixes_cidr }}"
+    zone: "{{ vpc_address_prefixes_zone }}"
+    state: present
+  register: roks_subnet
+  until: roks_subnet.msg.status == 'available'
+
+- name: ROKS - Attach public gateway to a subnet
+  goldyfruit.ibmcloud_automation.ic_is_subnet_gateway:
+    subnet: "{{ item.name }}-subnet"
+    gateway: "{{ item.name }}-gateway"
+    state: attach
+  register: roks_gw_attach
+  until: roks_gw_attach.msg.status == 'available'
+
+- name: ROKS - Fetch object storage standard plan id
+  goldyfruit.ibmcloud_automation.ic_catalog_object_storage_plan_info:
+    plan: standard
+  register: roks_plan_id
+
+- name: ROKS - Create resource instance for cluster storage
+  goldyfruit.ibmcloud_automation.ic_resource_instance:
+    instance: "{{ item.name }}-storage"
+    resource_group: "{{ item.name }}"
+    resource_plan: "{{ roks_plan_id.id }}"
+    target: global
+    tags: cos
+    state: present
+  register: roks_resource_instance_storage
+  until: roks_resource_instance_storage.msg.state == 'active'
+
+- name: ROKS - Create cluster
+  ansible.builtin.command:
+    cmd: |
+      {{ ibmcloud }} ks cluster create vpc-gen2
+      --name {{ item.name }}
+      --zone {{ vpc_address_prefixes_zone }}
+      --vpc-id {{ roks_vpc.msg.id }}
+      --subnet-id {{ roks_subnet.msg.id }}
+      --flavor {{ item.machines.worker.type }}
+      --workers {{ item.machines.worker.count }}
+      --version {{ roks_ocp_version }}
+      --cos-instance {{ roks_resource_instance_storage.msg.crn }}
+  changed_when: true

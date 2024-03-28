@@ -1,0 +1,59 @@
+---
+- name: ROKS - Define requested OCP version as major and minor
+  ansible.builtin.set_fact:
+    roks_req_ocp_major: "{{ item.openshift_version.split('.')[0] }}"
+    roks_req_ocp_minor: "{{ item.openshift_version.split('.')[1] }}"
+
+- name: ROKS - Locate available Openshift version aligned with users input
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} ks versions --show-version OpenShift --output json"
+  register: roks_ks_ver
+  changed_when: false
+
+- name: ROKS - Identify OCP version (major)
+  ansible.builtin.set_fact:
+    roks_ocp_major: "{{ (roks_ks_ver.stdout | from_json)['openshift']
+      | selectattr('major', 'match', roks_req_ocp_major)
+      | selectattr('minor', 'match', roks_req_ocp_minor)
+      | map(attribute='major') }}"
+
+- name: ROKS - Identify OCP version (minor)
+  ansible.builtin.set_fact:
+    roks_ocp_minor: "{{ (roks_ks_ver.stdout | from_json)['openshift']
+      | selectattr('major', 'match', roks_req_ocp_major)
+      | selectattr('minor', 'match', roks_req_ocp_minor)
+      | map(attribute='minor') }}"
+
+- name: ROKS - Identify OCP version (patch)
+  ansible.builtin.set_fact:
+    roks_ocp_patch: "{{ (roks_ks_ver.stdout | from_json)['openshift']
+      | selectattr('major', 'match', roks_req_ocp_major)
+      | selectattr('minor', 'match', roks_req_ocp_minor)
+      | map(attribute='patch') }}"
+
+- name: ROKS - Fail the execution of requested OCP version is not found
+  when: not roks_ocp_major
+  block:
+    - name: ROKS - Locate available OCP versions
+      ansible.builtin.command:
+        cmd: "{{ ibmcloud }} ks versions --show-version OpenShift -q"
+      register: roks_avail_ver
+      changed_when: false
+
+    - name: ROKS - Print message if requested OCP version is not found
+      vars:
+        msg: |
+          Requested OCP version is not found.
+
+          Use one of the following available versions:
+          {{ roks_avail_ver.stdout_lines }}
+      ansible.builtin.debug:
+        msg: "{{ msg.split('\n') }}"
+
+    - name: ROKS - Fail the execution if requested OCP version is not found
+      ansible.builtin.fail:
+        msg: "Requested OCP version is not found"
+
+- name: ROKS - Set OCP version for deployment
+  ansible.builtin.set_fact:
+    roks_ocp_version: "{{ roks_ocp_major[0] }}.{{ roks_ocp_minor[0] }}.{{ roks_ocp_patch[0] }}_openshift"
