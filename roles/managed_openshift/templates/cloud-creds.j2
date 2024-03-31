@@ -9,4 +9,14 @@ tenant={{ subscription.tenant_id }}
 [rhacm-automation]
 aws_access_key_id = {{ creds.aws_access_key_id }}
 aws_secret_access_key = {{ creds.aws_secret_access_key }}
+{% elif item.platform == "roks" %}
+clouds:
+  default: rhacm
+  rhacm:
+    profile: rhacm
+    description: Credentials from my IBM Cloud RHACM account
+    key: {{ creds.roks_token }}
+    region: {{ item.region }}
+    version: 2021-06-15
+    generation: 2
 {% endif %}
