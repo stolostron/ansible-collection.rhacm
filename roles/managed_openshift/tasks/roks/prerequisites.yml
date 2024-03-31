@@ -5,6 +5,21 @@
       | selectattr('name', 'equalto', item.credentials) | first }}"
   no_log: true
 
+- name: ROKS - Create platform credentials directory
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.ibmcloud"
+    mode: '0700'
+    state: directory
+
+- name: ROKS - Create account credentials file
+  ansible.builtin.blockinfile:
+    path: "{{ lookup('env', 'HOME') }}/.ibmcloud/clouds.yaml"
+    block: "{{ lookup('ansible.builtin.template', 'cloud-creds.j2') }}"
+    marker: "#{mark} rhacm-automation"
+    mode: '0600'
+    create: true
+    state: present
+
 - name: ROKS - Get latest ibm cli version
   ansible.builtin.uri:
     url: "https://api.github.com/repos/IBM-Cloud/ibm-cloud-cli-release/releases/latest"
