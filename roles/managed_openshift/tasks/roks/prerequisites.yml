@@ -47,6 +47,12 @@
     cmd: "{{ ibmcloud }} plugin install container-service -f"
   changed_when: true
 
+- name: ROKS - Login
+  ansible.builtin.command:
+    cmd: "{{ ibmcloud }} login --apikey {{ roks_creds.roks_token }} -r {{ item.region }} -q"
+  no_log: true
+  changed_when: false
+
 - name: ROKS - Fetch IBM cloud account details
   ansible.builtin.command:
     cmd: "{{ ibmcloud }} account show --output json"
