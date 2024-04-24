@@ -1,4 +1,5 @@
-kubernetes==25.3.0
+ansible==8.0.0
+kubernetes==29.0.0
 
 # Azure collection requirements
 packaging
