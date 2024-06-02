@@ -199,6 +199,18 @@ acm_hive_clusters:
     api_floating_ip: <cluster_floating_ip>
     ingress_floating_ip: <cluster_ingress_floating_ip>
     hive_cluster_version: "4.13"
+  # AWS ARM cluster
+  - name: cluster-aws-arm
+    credentials: aws-creds
+    platform: aws
+    architecture: arm64  # Define the 'architecture' for the cluster - amd64 / arm64
+    region: us-east-2
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    hive_cluster_version: "4.12"
 
 acm_hive_clusters_credentials:
   # AWS credentials

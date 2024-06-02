@@ -5,45 +5,51 @@ metadata:
 baseDomain: {{ creds.base_domain }}
 controlPlane:
   hyperthreading: Enabled
+{% if item.architecture is defined %}
+  architecture: {{ item.architecture }}
+{% endif %}
   name: master
   replicas: 3
   platform:
 {% if item.platform == "aws" %}
     aws:
-      {{ item.master_resource | default(platform_resources.aws.master_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.master_resource | default(platform_resources.aws[item.architecture | default('amd64')].master_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "gcp" %}
     gcp:
-      {{ item.master_resource | default(platform_resources.gcp.master_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.master_resource | default(platform_resources.gcp[item.architecture | default('amd64')].master_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "azr" %}
     azure:
-      {{ item.master_resource | default(platform_resources.azr.master_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.master_resource | default(platform_resources.azr[item.architecture | default('amd64')].master_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "vmw" %}
     vsphere:
-      {{ item.master_resource | default(platform_resources.vmw.master_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.master_resource | default(platform_resources.vmw[item.architecture | default('amd64')].master_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "openstack" %}
     openstack:
-      {{ item.master_resource | default(platform_resources.openstack.master_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.master_resource | default(platform_resources.openstack[item.architecture | default('amd64')].master_resource) | to_nice_yaml | indent(6) -}}
 {% endif %}
 compute:
 - hyperthreading: Enabled
+{% if item.architecture is defined %}
+  architecture: {{ item.architecture }}
+{% endif %}
   name: 'worker'
   replicas: 3
   platform:
 {% if item.platform == "aws" %}
     aws:
-      {{ item.worker_resource | default(platform_resources.aws.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.aws[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "gcp" %}
     gcp:
-      {{ item.worker_resource | default(platform_resources.gcp.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.gcp[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "azr" %}
     azure:
-      {{ item.worker_resource | default(platform_resources.azr.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.azr[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "vmw" %}
     vsphere:
-      {{ item.worker_resource | default(platform_resources.vmw.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.vmw[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "openstack" %}
     openstack:
-      {{ item.worker_resource | default(platform_resources.openstack.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.openstack[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% endif %}
 networking:
   networkType: {{ item.network.type }}

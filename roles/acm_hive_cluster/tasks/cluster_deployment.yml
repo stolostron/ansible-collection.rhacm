@@ -12,7 +12,7 @@
 - name: Select latest hive cluster image according to provided version
   ansible.builtin.set_fact:
     hive_cluster_ver: "{{ img.json.tags
-      | selectattr('name', 'match', item.hive_cluster_version + '.*' + cluster_architecture | string)
+      | selectattr('name', 'match', item.hive_cluster_version + '.*' + 'multi' | string)
       | map(attribute='name') | first }}"
   when: item.hive_cluster_image is not defined
 

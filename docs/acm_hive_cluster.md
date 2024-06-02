@@ -36,6 +36,7 @@ ssh_pub_key:
 #### ACM Hive clusters
 Defines hive clusters that should be deployed on the Hub.
 **Note** - For more provides and override options, refer to `config-sample.yml` file.
+**Note** - Cluster architecture could be modified by setting `architecture` parameter. Check `cluster-aws-arm` cluster for example.
 ```
 acm_hive_clusters:
   # AWS cluster
@@ -99,6 +100,18 @@ acm_hive_clusters:
     api_floating_ip: <cluster_floating_ip>
     ingress_floating_ip: <cluster_ingress_floating_ip>
     hive_cluster_version: "4.13"
+  # AWS ARM based cluster
+  - name: cluster-aws-arm
+    credentials: aws-creds
+    platform: aws
+    architecture: arm64  # Define the 'architecture' for the cluster - amd64 / arm64
+    region: us-east-2
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    hive_cluster_version: "4.12"  # Takes the latest available image
 ```
 
 #### Clusters credentials
@@ -194,54 +207,77 @@ Cluster specific resources should be defined within the cluster definition under
 ```
 platform_resources:
   aws:
-    master_resource:
-      type: m5.xlarge
-      rootVolume:
-        iops: 4000
-        size: 100
-        type: io1
-    worker_resource:
-      type: m5.xlarge
-      rootVolume:
-        iops: 2000
-        size: 100
-        type: io1
+    amd64:
+      master_resource:
+        type: m5.xlarge
+        rootVolume:
+          iops: 4000
+          size: 100
+          type: io1
+      worker_resource:
+        type: m5.xlarge
+        rootVolume:
+          iops: 2000
+          size: 100
+          type: io1
+    arm64:
+      master_resource:
+        type: m6g.2xlarge
+        rootVolume:
+          iops: 4000
+          size: 100
+          type: io1
+      worker_resource:
+        type: m6g.2xlarge
+        rootVolume:
+          iops: 2000
+          size: 100
+          type: io1
   gcp:
-    master_resource:
-      type: n1-standard-4
-    worker_resource:
-      type: n1-standard-4
+    amd64:
+      master_resource:
+        type: n1-standard-4
+      worker_resource:
+        type: n1-standard-4
+    arm64:
+      master_resource:
+        type: t2a-standard-4
+      worker_resource:
+        type: t2a-standard-4
   azr:
-    master_resource:
-      type:  Standard_D4s_v3
-      osDisk:
-        diskSizeGB: 128
-    worker_resource:
-      type:  Standard_D2s_v3
-      osDisk:
-        diskSizeGB: 128
-      zones:
-      - "1"
-      - "2"
-      - "3"
+    amd64:
+      master_resource:
+        type: Standard_D4s_v3
+        osDisk:
+          diskSizeGB: 128
+      worker_resource:
+        type: Standard_D2s_v3
+        osDisk:
+          diskSizeGB: 128
+        zones:
+          - "1"
+          - "2"
+          - "3"
   vmw:
-    master_resource:
-      cpus: 4
-      coresPerSocket: 2
-      memoryMB: 16384
-      osDisk:
-        diskSizeGB: 120
-    worker_resource:
-      cpus: 4
-      coresPerSocket: 2
-      memoryMB: 16384
-      osDisk:
-        diskSizeGB: 120
+    amd64:
+      master_resource:
+        cpus: 4
+        coresPerSocket: 2
+        memoryMB: 16384
+        osDisk:
+          diskSizeGB: 120
+      worker_resource:
+        cpus: 4
+        coresPerSocket: 2
+        memoryMB: 16384
+        osDisk:
+          diskSizeGB: 120
   openstack:
-    master_resource:
-      type: PnTAE.CPU_4_Memory_16384_Disk_50
-    worker_resource:
-      type: PnTAE.CPU_4_Memory_16384_Disk_50
+    amd64:
+      master_resource:
+        type: PnTAE.CPU_4_Memory_16384_Disk_50
+      worker_resource:
+        type: PnTAE.CPU_4_Memory_16384_Disk_50
 ```
 
 ***
