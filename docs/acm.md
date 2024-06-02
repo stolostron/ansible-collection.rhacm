@@ -32,6 +32,36 @@ The namespace that should be used for ACM MCH deployment.
 acm_namespace: open-cluster-management
 ```
 
+#### ACM components to enable/disable
+Define which components should be enabled/disabled during deployment
+```
+acm_components:
+  - name: app-lifecycle
+    enabled: true
+  - name: cluster-lifecycle
+    enabled: true
+  - name: cluster-permission
+    enabled: true
+  - name: console
+    enabled: true
+  - name: grc
+    enabled: true
+  - name: insights
+    enabled: true
+  - name: multicluster-engine
+    enabled: true
+  - name: multicluster-observability
+    enabled: true
+  - name: search
+    enabled: false
+  - name: submariner-addon
+    enabled: true
+  - name: volsync
+    enabled: true
+  - name: cluster-backup
+    enabled: true
+```
+
 #### Deploy testing environment
 If it's "false", ACM will be deployed from official RH registry 
 If it's "true", ACM will be deployed from downstream testing registry

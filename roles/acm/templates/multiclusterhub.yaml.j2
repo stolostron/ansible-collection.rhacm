@@ -12,9 +12,13 @@ metadata:
 {% endif %}
   name: multiclusterhub
   namespace: "{{ acm_namespace }}"
-{% if deploy_test_env | bool %}
 spec:
+{% if deploy_test_env | bool %}
   imagePullSecret: multiclusterhub-operator-pull-secret
-{% else %}
-spec: {}
 {% endif %}
+  overrides:
+    components:
+{% for component in acm_components %}
+    - name: {{ component.name }}
+      enabled: {{ component.enabled }}
+{% endfor %}
