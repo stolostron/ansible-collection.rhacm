@@ -10,18 +10,18 @@ spec:
   platform:
 {% if item.platform == "aws" %}
     aws:
-      {{ item.worker_resource | default(platform_resources.aws.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.aws[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "gcp" %}
     gcp:
-      {{ item.worker_resource | default(platform_resources.gcp.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.gcp[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "azr" %}
     azure:
-      {{ item.worker_resource | default(platform_resources.azr.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.azr[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "vmw" %}
     vsphere:
-      {{ item.worker_resource | default(platform_resources.vmw.worker_resource) | to_nice_yaml | indent(6) -}}
+      {{ item.worker_resource | default(platform_resources.vmw[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) -}}
 {% elif item.platform == "openstack" %}
     openstack:
-      {{ item.worker_resource | default(platform_resources.openstack.worker_resource) | to_nice_yaml | indent(6) | replace("type", "flavor") -}}
+      {{ item.worker_resource | default(platform_resources.openstack[item.architecture | default('amd64')].worker_resource) | to_nice_yaml | indent(6) | replace("type", "flavor") -}}
 {% endif %}
   replicas: 3
