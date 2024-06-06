@@ -1,0 +1,24 @@
+---
+- name: ROSA - Locate available Openshift version aligned with users input
+  ansible.builtin.command:
+    cmd: "{{ rosa }} list versions --output json"
+  register: rosa_ocp_ver
+  changed_when: false
+
+- name: ROSA - Identify the OCP version to deploy
+  block:
+    - name: ROSA - Identify the exact OCP version by to deploy by user request
+      ansible.builtin.set_fact:
+        ocp_version: "{{ rosa_ocp_ver.stdout
+          | from_json
+          | selectattr('raw_id', 'search', '^' + item.openshift_version)
+          | map(attribute='raw_id')
+          | first }}"
+
+    - name: ROSA - Print identified OCP version to deploy
+      ansible.builtin.debug:
+        msg: "Openshift version {{ ocp_version }} will be deployed"
+  rescue:
+    - name: ROSA - Fail the execution if requested OCP version is not found
+      ansible.builtin.fail:
+        msg: "ROSA - Requested version {{ item.openshift_version }} is not found. Try to change the version."

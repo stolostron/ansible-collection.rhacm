@@ -63,7 +63,7 @@ managed_openshift_clusters:
       worker:
         type: m5.xlarge
         count: 3
-    openshift_version: "4.13.6"  # Optional. If not specified, will use the latest.
+    openshift_version: "4.15"
     skip_tls_verify: true  # Optional. Set the flag in the kubeconfig file.
 
   # ROKS cluster
