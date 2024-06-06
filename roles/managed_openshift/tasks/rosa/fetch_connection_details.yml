@@ -15,12 +15,12 @@
 - name: Handle ROSA user creation
   block:
     - name: ROSA - Create admin user
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: |
-          {{ rosa }} --profile rhacm-automation
-          create admin
-          --cluster {{ item.name }}
-          --region {{ item.region }}
+          export AWS_REGION="{{ item.region }}"
+          {{ rosa }} --profile rhacm-automation \
+          create admin \
+          --cluster {{ item.name }} \
           -o json
       register: rosa_admin
       no_log: true
@@ -37,12 +37,12 @@
       changed_when: true
 
     - name: ROSA - Create admin user
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: |
-          {{ rosa }} --profile rhacm-automation
-          create admin
-          --cluster {{ item.name }}
-          --region {{ item.region }}
+          export AWS_REGION="{{ item.region }}"
+          {{ rosa }} --profile rhacm-automation \
+          create admin \
+          --cluster {{ item.name }} \
           -o json
       register: rosa_admin
       no_log: true
