@@ -38,6 +38,10 @@
   ansible.builtin.debug:
     msg: "{{ rosa_whoami.stdout_lines }}"
 
+- name: ROSA - Identify deployment version
+  ansible.builtin.include_tasks:
+    file: fetch_version.yml
+
 - name: ROSA - Create cluster
   ansible.builtin.command:
     cmd: |
@@ -51,9 +55,7 @@
       --compute-machine-type {{ item.machines.worker.type }}
       --replicas {{ item.machines.worker.count }}
       --channel-group {{ item.channel_group | default('stable') }}
-      {% if item.version is defined %}
-      --version {{ item.openshift_version }}
-      {% endif %}
+      --version {{ ocp_version }}
       {% if item.multi_az is defined and item.multi_az | bool %}
       --multi-az
       {% endif %}
