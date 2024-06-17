@@ -46,7 +46,7 @@ managed_openshift_clusters:
         type: Standard_D4s_v3
         disk_size: 128
         count: 3
-    openshift_version: "4.11.26"  # To check for available ARO versions, execute "az aro get-versions --location <location>" command.
+    openshift_version: "4.14"
 
   # ROSA cluster
   - name: cluster-rosa

@@ -50,6 +50,10 @@
   ansible.builtin.include_tasks:
     file: rbac.yml
 
+- name: ARO - Identify deployment version
+  ansible.builtin.include_tasks:
+    file: fetch_version.yml
+
 - name: ARO - Create cluster
   azure.azcollection.azure_rm_openshiftmanagedcluster:
     profile: rhacm-automation
@@ -59,7 +63,7 @@
     cluster_profile:
       domain: "{{ item.name }}.{{ item.base_domain }}"
       pull_secret: "{{ pull_secret | string }}"
-      version: "{{ item.openshift_version | default(omit) }}"
+      version: "{{ ocp_version }}"
     service_principal_profile:
       client_id: "{{ app_id }}"
       client_secret: "{{ subscription.client_secret }}"
