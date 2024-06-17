@@ -1,0 +1,20 @@
+---
+- name: ARO - Fetch available Openshift versions
+  azure_rm_openshiftmanagedclusterversion_info:
+    profile: rhacm-automation
+    location: "{{ item.region }}"
+  register: aro_cluster_vers
+
+- name: ARO - Identify the OCP version to deploy
+  block:
+    - name: ARO - Identify the exact OCP version by to deploy by user request
+      ansible.builtin.set_fact:
+        ocp_version: "{{ aro_cluster_vers.versions | select('search', item.openshift_version) | first }}"
+
+    - name: ARO - Print identified OCP version to deploy
+      ansible.builtin.debug:
+        msg: "Openshift version {{ ocp_version }} will be deployed"
+  rescue:
+    - name: ARO - Fail the execution if requested OCP version is not found
+      ansible.builtin.fail:
+        msg: "ARO - Requested version {{ item.openshift_version }} is not found. Try to change the version."
