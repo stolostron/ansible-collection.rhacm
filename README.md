@@ -18,7 +18,7 @@ Name | Description
 
 Before using this collection, you need to install it with the Ansible Galaxy command-line tool:
 ```bash
-ansible-galaxy collection install git+https://github.com/stolostron/ansible-collection.rhacm.git,v0.0.3
+ansible-galaxy collection install git+https://github.com/stolostron/ansible-collection.rhacm.git,v0.0.4
 ```
 
 You can also include it in a `requirements.yml` file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
@@ -27,7 +27,7 @@ You can also include it in a `requirements.yml` file and install it with `ansibl
 collections:
   - name: https://github.com/stolostron/ansible-collection.rhacm.git
     type: git
-    version: v0.0.3
+    version: v0.0.4
 ```
 
 The `kubernetes` pip package needs to be installed as it required by some of the collection roles.  
