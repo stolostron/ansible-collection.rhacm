@@ -16,9 +16,11 @@ spec:
 {% if deploy_test_env | bool %}
   imagePullSecret: multiclusterhub-operator-pull-secret
 {% endif %}
+{% if acm_components_overrides[0] is defined %}
   overrides:
     components:
-{% for component in acm_components %}
+{% for component in acm_components_overrides %}
     - name: {{ component.name }}
       enabled: {{ component.enabled }}
 {% endfor %}
+{% endif %}
