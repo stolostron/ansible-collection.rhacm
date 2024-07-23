@@ -31,11 +31,6 @@ EXAMPLES = '''
 - name: Obtain openshift versions for ARO cluster
   azure_rm_openshiftmanagedclusterversion_info:
     location: centralus
-  register: ocp_versions
-
-- name: Print available openshift versions
-  debug:
-    msg: "{{ ocp_versions }}"
 '''
 
 RETURN = '''
@@ -113,7 +108,10 @@ class AzureRMOpenShiftManagedClustersVersionInfo(AzureRMModuleBaseExt):
                                               self.status_code,
                                               600,
                                               30)
-            resp_results = json.loads(response.text)
+            if isinstance(response.text, str):
+                resp_results = json.loads(response.text)
+            else:
+                resp_results = json.loads(response.text())
         except Exception as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
         results['versions'] = self.format_versions(resp_results)
