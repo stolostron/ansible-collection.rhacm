@@ -11,18 +11,18 @@ ssh_key: |
     <private_ssh_key>
 
 # For other acm hive clusters platforms,
-# refer to role doc and config-sample.yml file.
-# acm_hive_clusters:
-#   - name: cluster1
-#     credentials: cluster1-creds
-#     platform: aws
-#     region: us-east-2
-#     network:
-#       cluster: 10.128.0.0/14
-#       machine: 10.0.0.0/16
-#       service: 172.30.0.0/16
-#       type: OVNKubernetes
-#     hive_cluster_version: "4.12"
+# refer to README and config-sample.yml file.
+acm_hive_clusters:
+  - name: cluster1
+    credentials: cluster1-creds
+    platform: aws
+    region: us-east-2
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    hive_cluster_version: "4.12"
 
 # For other credentials types,
 # refer to README and config-sample.yml file.
