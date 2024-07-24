@@ -8,22 +8,20 @@ pull_secret:
 # Your SSH Public key
 ssh_pub_key:
 
-# For other ocp clusters platforms,
-# refer to role doc and config-sample.yml file.
-# clusters:
-#   - name: test-cluster
-#     base_domain: example.com
-#     credentials: aws-creds
-#     network:
-#       cluster: 10.128.0.0/14
-#       machine: 10.0.0.0/16
-#       service: 172.30.0.0/16
-#       type: OVNKubernetes
-#     cloud:
-#       platform: aws
-#       region: us-east-2
-#       instance_type: m5.xlarge
-#     openshift_version: "4.12"  # Optional variable to set OCP version per cluster
+clusters:
+  - name: test-cluster
+    base_domain: example.com
+    credentials: aws-creds
+    network:
+      cluster: 10.128.0.0/14
+      machine: 10.0.0.0/16
+      service: 172.30.0.0/16
+      type: OVNKubernetes
+    cloud:
+      platform: aws
+      region: us-east-2
+      instance_type: m5.xlarge
+    openshift_version: "4.12"  # Optional variable to set OCP version per cluster
 
 clusters_credentials:
   - name: aws-creds
