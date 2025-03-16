@@ -32,5 +32,5 @@
     loop_var: "async_result_item"
   register: async_poll_results
   until: async_poll_results.finished
-  retries: 150
-  delay: 25
+  retries: 170
+  delay: 30

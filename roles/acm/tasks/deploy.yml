@@ -54,8 +54,8 @@
     - acm_subscription.resources | length > 0
     - "'status' in acm_subscription.resources[0]"
     - "'currentCSV' in acm_subscription.resources[0].status"
-  retries: 15
-  delay: 10
+  retries: 20
+  delay: 15
 
 - name: Wait for the ClusterServiceVersion to succeeded install
   kubernetes.core.k8s_info:
@@ -72,8 +72,8 @@
     - "'status' in acm_csv.resources[0]"
     - "'phase' in acm_csv.resources[0].status"
     - acm_csv.resources[0].status.phase == "Succeeded"
-  retries: 15
-  delay: 10
+  retries: 20
+  delay: 15
 
 - name: Deploy MultiClusterHub
   community.okd.k8s:
