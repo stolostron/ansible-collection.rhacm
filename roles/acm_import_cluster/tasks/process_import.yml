@@ -39,7 +39,7 @@
     kind: ManagedCluster
     name: "{{ item.name }}"
     wait: true
-    wait_timeout: 900
+    wait_timeout: 1200
     wait_condition:
       type: ManagedClusterJoined
       status: true
@@ -54,7 +54,7 @@
     kind: ManagedCluster
     name: "{{ item.name }}"
     wait: true
-    wait_timeout: 900
+    wait_timeout: 1200
     wait_condition:
       type: ManagedClusterConditionAvailable
       status: true
@@ -104,7 +104,7 @@
     kind: ManagedCluster
     name: "{{ item }}"
     wait: true
-    wait_timeout: 900
+    wait_timeout: 1200
     wait_condition:
       type: ManagedClusterImportSucceeded
       status: true

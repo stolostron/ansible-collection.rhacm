@@ -61,8 +61,8 @@
   loop: "{{ clusters_to_import }}"
   register: remove_clusters
   until: remove_clusters.resources | length == 0
-  retries: 25
-  delay: 15
+  retries: 30
+  delay: 20
   when: state == "absent"
 
 - name: Print state message
