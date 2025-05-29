@@ -58,5 +58,5 @@
     - "'connectionState' in acm_catalog.resources[0].status"
     - "'lastObservedState' in acm_catalog.resources[0].status.connectionState"
     - acm_catalog.resources[0].status.connectionState.lastObservedState == "READY"
-  retries: 15
-  delay: 10
+  retries: 30
+  delay: 20
