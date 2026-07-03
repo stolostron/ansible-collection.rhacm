@@ -43,18 +43,22 @@
 - name: Select latest ACM tag matching the configured version
   ansible.builtin.set_fact:
     acm_latest_tag: "{{ acm_tags_response.json.tags
+      | default([])
       | selectattr('name', 'match', '^latest-' + acm_version + '.*')
       | map(attribute='name')
       | list
-      | first | default('latest-' + acm_version) }}"
+      | default(['latest-' + acm_version])
+      | first }}"
 
 - name: Select latest MCE tag matching the configured version
   ansible.builtin.set_fact:
     mce_latest_tag: "{{ mce_tags_response.json.tags
+      | default([])
       | selectattr('name', 'match', '^latest-' + acm_version + '.*')
       | map(attribute='name')
       | list
-      | first | default('latest-' + acm_version) }}"
+      | default(['latest-' + acm_version])
+      | first }}"
 
 # DEPRECATED: Old method with loop
 # - name: Build catalog_sources list with dynamic tags
