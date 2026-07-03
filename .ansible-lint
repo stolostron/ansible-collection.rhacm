@@ -4,3 +4,8 @@ skip_list:
   - galaxy[no-changelog]
   - galaxy[tags]
   - galaxy[version-incorrect]
+
+exclude_paths:
+  - .ansible/
+  - .github/
+  - .vscode/
