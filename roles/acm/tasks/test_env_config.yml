@@ -2,24 +2,100 @@
 # The following two tasks represent the following bash command:
 # curl -s -X GET https://quay.io/api/v1/repository/acm-d/acm-custom-registry/tag/ \
 # | jq -S '.tags[] | {name: .name} | select(.name | startswith("2.8"))' | jq -r '.name' | head -1
-- name: Fetch testing snapshots if snapshot not provided manually
+# - name: Fetch testing snapshots if snapshot not provided manually
+#   ansible.builtin.uri:
+#     url: "{{ registry_query_url }}/?filter_tag_name=like:{{ acm_version }}"
+#     method: "GET"
+#     status_code: 200
+#   register: snap
+#   when: snapshot is none
+
+# - name: Select latest testing snapshot according to provided version
+#   ansible.builtin.set_fact:
+#     snapshot: "{{ snap.json.tags
+#       | selectattr('name', 'match', acm_version)
+#       | map(attribute='name') | first }}"
+#   when: snapshot is none
+
+# - name: Print selected snapshot for ACM deployment
+#   ansible.builtin.debug:
+#     msg: "ACM version '{{ acm_version }}' with '{{ snapshot }}' snapshot will be deployed"
+
+# NEW: Fetch latest tags dynamically based on ACM version
+- name: Fetch latest ACM catalog tag from Quay.io
   ansible.builtin.uri:
-    url: "{{ registry_query_url }}/?filter_tag_name=like:{{ acm_version }}"
+    url: "{{ catalog_tag_query_urls.acm }}"
     method: "GET"
     status_code: 200
-  register: snap
-  when: snapshot is none
+  register: acm_tags_response
+  retries: 5
+  delay: 3
 
-- name: Select latest testing snapshot according to provided version
+- name: Fetch latest MCE catalog tag from Quay.io
+  ansible.builtin.uri:
+    url: "{{ catalog_tag_query_urls.mce }}"
+    method: "GET"
+    status_code: 200
+  register: mce_tags_response
+  retries: 5
+  delay: 3
+
+- name: Select latest ACM tag matching the configured version
   ansible.builtin.set_fact:
-    snapshot: "{{ snap.json.tags
-      | selectattr('name', 'match', acm_version)
-      | map(attribute='name') | first }}"
-  when: snapshot is none
+    acm_latest_tag: "{{ acm_tags_response.json.tags
+      | selectattr('name', 'match', '^latest-' + acm_version + '.*')
+      | map(attribute='name')
+      | list
+      | first | default('latest-' + acm_version) }}"
 
-- name: Print selected snapshot for ACM deployment
+- name: Select latest MCE tag matching the configured version
+  ansible.builtin.set_fact:
+    mce_latest_tag: "{{ mce_tags_response.json.tags
+      | selectattr('name', 'match', '^latest-' + acm_version + '.*')
+      | map(attribute='name')
+      | list
+      | first | default('latest-' + acm_version) }}"
+
+# DEPRECATED: Old method with loop
+# - name: Build catalog_sources list with dynamic tags
+#   ansible.builtin.set_fact:
+#     catalog_sources: >-
+#       {{
+#         catalog_sources_template | map('combine', {
+#           'tag': acm_latest_tag if item.type == 'acm' else mce_latest_tag
+#         }) | list
+#       }}
+#   loop: "{{ catalog_sources_template }}"
+#   loop_control:
+#     loop_var: item
+
+# NEW: Build ACM catalog source with dynamic tag
+- name: Add ACM catalog source with dynamic tag
+  ansible.builtin.set_fact:
+    acm_catalog: "{{ catalog_sources_template | selectattr('type', 'equalto', 'acm') | first | combine({'tag': acm_latest_tag}) }}"
+
+# NEW: Build MCE catalog source with dynamic tag
+- name: Add MCE catalog source with dynamic tag
+  ansible.builtin.set_fact:
+    mce_catalog: "{{ catalog_sources_template | selectattr('type', 'equalto', 'mce') | first | combine({'tag': mce_latest_tag}) }}"
+
+# NEW: Combine into catalog_sources list
+- name: Build catalog_sources list
+  ansible.builtin.set_fact:
+    catalog_sources:
+      - "{{ acm_catalog }}"
+      - "{{ mce_catalog }}"
+
+- name: Print dynamically determined catalog tags
   ansible.builtin.debug:
-    msg: "ACM version '{{ acm_version }}' with '{{ snapshot }}' snapshot will be deployed"
+    msg:
+      - "ACM version: {{ acm_version }}"
+      - "ACM catalog tag: {{ acm_latest_tag }}"
+      - "MCE catalog tag: {{ mce_latest_tag }}"
+
+- name: Print ACM catalog sources that will be deployed
+  ansible.builtin.debug:
+    msg: "Deploying ACM catalogs: {{ catalog_sources | json_query('[*].[type, repo_name, tag]') }}"
 
 - name: Update cluster pull-secret secret
   ansible.builtin.include_tasks:

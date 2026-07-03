@@ -7,7 +7,8 @@ spec:
   displayName: "{{ item.display_name }}"
   publisher: Red Hat
   sourceType: grpc
-  image: "{{ acm_registry_mirror }}/{{ item.catalog_name }}:{{ snapshot }}"
+  #image: "{{ acm_registry_mirror }}/{{ item.catalog_name }}:{{ snapshot }}"
+  image: "{{ acm_registry_mirror }}/{{ item.repo_name }}:{{ item.tag }}"
   updateStrategy:
     registryPoll:
       interval: 10m
