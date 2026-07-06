@@ -13,8 +13,7 @@ registry_query_url: https://quay.io/api/v1/repository/acm-d/acm-custom-registry/
 #     catalog_ns: openshift-marketplace
 
 
-# DEPRECATED: Hardcoded catalog sources with fixed tags
-  # Hardcoded catalog tags for ACM 2.17
+# Hardcoded catalog tags for ACM 2.17 (will be used when catalog_sources_template + when conditions skip dynamic fetching)
 acm_catalog_tag: "latest-2.17"
 mce_catalog_tag: "latest-2.17"
 
@@ -33,21 +32,21 @@ catalog_sources:
     repo_name: mce-dev-catalog
     tag: latest-2.17
 
-# NEW: Dynamic catalog sources - tags will be fetched at runtime based on acm_version
-# catalog_sources_template:
-#   - type: acm
-#     catalog_name: acm-custom-registry
-#     display_name: Advanced Cluster Management
-#     catalog_ns: openshift-marketplace
-#     repo_name: acm-dev-catalog
-#   - type: mce
-#     catalog_name: mce-custom-registry
-#     display_name: MultiCluster Engine
-#     catalog_ns: openshift-marketplace
-#     repo_name: mce-dev-catalog
+# Dynamic catalog sources template - tags will be set at runtime based on acm_version
+catalog_sources_template:
+  - type: acm
+    catalog_name: acm-custom-registry
+    display_name: Advanced Cluster Management
+    catalog_ns: openshift-marketplace
+    repo_name: acm-dev-catalog
+  - type: mce
+    catalog_name: mce-custom-registry
+    display_name: MultiCluster Engine
+    catalog_ns: openshift-marketplace
+    repo_name: mce-dev-catalog
 
-# # Quay.io API URLs for fetching latest tags
-# # NOTE: Query tags from acm-custom-registry (public) but deploy images from acm-dev-catalog
-# catalog_tag_query_urls:
-#   acm: "https://quay.io/api/v1/repository/acm-d/acm-dev-catalog/tag/"
-#   mce: "https://quay.io/api/v1/repository/acm-d/mce-dev-catalog/tag/"
+# Quay.io API URLs for fetching latest tags
+# NOTE: Query tags from acm-dev-catalog (requires authentication, tasks will skip if catalog tags are predefined)
+catalog_tag_query_urls:
+  acm: "https://quay.io/api/v1/repository/acm-d/acm-dev-catalog/tag/"
+  mce: "https://quay.io/api/v1/repository/acm-d/mce-dev-catalog/tag/"

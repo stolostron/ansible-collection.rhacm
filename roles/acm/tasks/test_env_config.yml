@@ -30,6 +30,7 @@
   register: acm_tags_response
   retries: 5
   delay: 3
+  when: acm_catalog_tag is not defined
 
 - name: Fetch latest MCE catalog tag from Quay.io
   ansible.builtin.uri:
@@ -39,6 +40,7 @@
   register: mce_tags_response
   retries: 5
   delay: 3
+  when: mce_catalog_tag is not defined
 
 - name: Select latest ACM tag matching the configured version
   ansible.builtin.set_fact:
@@ -49,6 +51,7 @@
       | list
       | default(['latest-' + acm_version])
       | first }}"
+  when: acm_catalog_tag is not defined
 
 - name: Select latest MCE tag matching the configured version
   ansible.builtin.set_fact:
@@ -59,6 +62,7 @@
       | list
       | default(['latest-' + acm_version])
       | first }}"
+  when: mce_catalog_tag is not defined
 
 # DEPRECATED: Old method with loop
 # - name: Build catalog_sources list with dynamic tags
@@ -76,12 +80,12 @@
 # NEW: Build ACM catalog source with dynamic tag
 - name: Add ACM catalog source with dynamic tag
   ansible.builtin.set_fact:
-    acm_catalog: "{{ catalog_sources_template | selectattr('type', 'equalto', 'acm') | first | combine({'tag': acm_latest_tag}) }}"
+    acm_catalog: "{{ catalog_sources_template | selectattr('type', 'equalto', 'acm') | first | combine({'tag': acm_catalog_tag | default(acm_latest_tag)}) }}"
 
 # NEW: Build MCE catalog source with dynamic tag
 - name: Add MCE catalog source with dynamic tag
   ansible.builtin.set_fact:
-    mce_catalog: "{{ catalog_sources_template | selectattr('type', 'equalto', 'mce') | first | combine({'tag': mce_latest_tag}) }}"
+    mce_catalog: "{{ catalog_sources_template | selectattr('type', 'equalto', 'mce') | first | combine({'tag': mce_catalog_tag | default(mce_latest_tag)}) }}"
 
 # NEW: Combine into catalog_sources list
 - name: Build catalog_sources list
@@ -94,8 +98,8 @@
   ansible.builtin.debug:
     msg:
       - "ACM version: {{ acm_version }}"
-      - "ACM catalog tag: {{ acm_latest_tag }}"
-      - "MCE catalog tag: {{ mce_latest_tag }}"
+      - "ACM catalog tag: {{ acm_catalog_tag | default(acm_latest_tag) }}"
+      - "MCE catalog tag: {{ mce_catalog_tag | default(mce_latest_tag) }}"
 
 - name: Print ACM catalog sources that will be deployed
   ansible.builtin.debug:
