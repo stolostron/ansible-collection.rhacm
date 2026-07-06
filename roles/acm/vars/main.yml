@@ -14,6 +14,10 @@ registry_query_url: https://quay.io/api/v1/repository/acm-d/acm-custom-registry/
 
 
 # DEPRECATED: Hardcoded catalog sources with fixed tags
+  # Hardcoded catalog tags for ACM 2.17
+acm_catalog_tag: "latest-2.17"
+mce_catalog_tag: "latest-2.17"
+
 catalog_sources:
   - type: acm
     catalog_name: acm-custom-registry
