@@ -30,6 +30,7 @@
   register: acm_tags_response
   retries: 5
   delay: 3
+  when: acm_catalog_tag is not defined
 
 - name: Fetch latest MCE catalog tag from Quay.io
   ansible.builtin.uri:
@@ -39,6 +40,7 @@
   register: mce_tags_response
   retries: 5
   delay: 3
+  when: mce_catalog_tag is not defined
 
 - name: Select latest ACM tag matching the configured version
   ansible.builtin.set_fact:
@@ -49,6 +51,7 @@
       | list
       | default(['latest-' + acm_version])
       | first }}"
+  when: acm_catalog_tag is not defined
 
 - name: Select latest MCE tag matching the configured version
   ansible.builtin.set_fact:
@@ -59,6 +62,7 @@
       | list
       | default(['latest-' + acm_version])
       | first }}"
+  when: mce_catalog_tag is not defined
 
 # DEPRECATED: Old method with loop
 # - name: Build catalog_sources list with dynamic tags

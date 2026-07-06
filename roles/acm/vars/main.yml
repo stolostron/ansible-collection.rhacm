@@ -49,5 +49,5 @@ catalog_sources:
 # # Quay.io API URLs for fetching latest tags
 # # NOTE: Query tags from acm-custom-registry (public) but deploy images from acm-dev-catalog
 # catalog_tag_query_urls:
-#   acm: "https://quay.io/api/v1/repository/acm-d/acm-dev-catalog/tag/"
-#   mce: "https://quay.io/api/v1/repository/acm-d/mce-dev-catalog/tag/"
+  acm: "https://quay.io/api/v1/repository/acm-d/acm-dev-catalog/tag/"
+  mce: "https://quay.io/api/v1/repository/acm-d/mce-dev-catalog/tag/"
