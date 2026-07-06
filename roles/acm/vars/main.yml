@@ -20,13 +20,13 @@ catalog_sources:
     display_name: Advanced Cluster Management
     catalog_ns: openshift-marketplace
     repo_name: acm-dev-catalog
-    tag:  latest-2.17
+    tag: latest-2.17
   - type: mce
     catalog_name: mce-custom-registry
     display_name: MultiCluster Engine
     catalog_ns: openshift-marketplace
     repo_name: mce-dev-catalog
-    tag:  latest-2.17
+    tag: latest-2.17
 
 # NEW: Dynamic catalog sources - tags will be fetched at runtime based on acm_version
 # catalog_sources_template:
