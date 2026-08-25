@@ -13,24 +13,9 @@ registry_query_url: https://quay.io/api/v1/repository/acm-d/acm-custom-registry/
 #     catalog_ns: openshift-marketplace
 
 
-# Hardcoded catalog tags for ACM 2.17 (will be used when catalog_sources_template + when conditions skip dynamic fetching)
-acm_catalog_tag: "latest-2.17"
-mce_catalog_tag: "latest-2.17"
+# Catalog tags can be explicitly defined in config file
+# If not defined, they will be fetched dynamically from Quay.io based on acm_version
 
-
-catalog_sources:
-  - type: acm
-    catalog_name: acm-custom-registry
-    display_name: Advanced Cluster Management
-    catalog_ns: openshift-marketplace
-    repo_name: acm-dev-catalog
-    tag: latest-2.17
-  - type: mce
-    catalog_name: mce-custom-registry
-    display_name: MultiCluster Engine
-    catalog_ns: openshift-marketplace
-    repo_name: mce-dev-catalog
-    tag: latest-2.17
 
 # Dynamic catalog sources template - tags will be set at runtime based on acm_version
 catalog_sources_template:
